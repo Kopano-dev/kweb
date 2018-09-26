@@ -40,11 +40,11 @@ $(BASE): ; $(info creating local GOPATH ...)
 
 .PHONY: $(CMDS)
 $(CMDS): vendor | $(BASE) ; $(info building $@ ...) @
-	cd $(BASE) && CGO_ENABLED=1 $(GO) build \
+	cd $(BASE) && $(GO) build \
 		-tags release \
 		-asmflags '-trimpath=$(GOPATH)' \
 		-gcflags '-trimpath=$(GOPATH)' \
-		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE)' \
+		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -X $(PACKAGE)/vendor/github.com/mholt/caddy/caddy/caddymain.gitTag=kweb-$(VERSION) -X $(PACKAGE)/vendor/github.com/mholt/caddy/caddy/caddymain.buildDate=$(DATE) -extldflags -static' \
 		-o bin/$(notdir $@) $(PACKAGE)/$@
 
 # Helpers
