@@ -6,20 +6,17 @@
 package main
 
 import (
-	"github.com/mholt/caddy/caddy/caddymain"
+	"fmt"
+	"os"
 
-	// Plugins.
-	_ "github.com/captncraig/caddy-realip"
-	_ "github.com/mastercactapus/caddy-proxyprotocol"
-	_ "github.com/miekg/caddy-prometheus"
-	_ "github.com/pyed/ipfilter"
-	_ "github.com/xuqingfeng/caddy-rate-limit"
+	"stash.kopano.io/kgol/kweb/cmd"
 )
 
-func init() {
-	caddymain.EnableTelemetry = false
-}
-
 func main() {
-	caddymain.Run()
+	cmd.RootCmd.AddCommand(commandCaddy())
+
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }

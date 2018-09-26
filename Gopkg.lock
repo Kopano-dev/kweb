@@ -14,14 +14,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0baeef5e911d1bdf5804f77045650c298296c37aea99e98a29bc003acd0e9635"
-  name = "github.com/armon/go-proxyproto"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5b7edb60ff5f69b60d1950397f7bde6171f1807d"
-
-[[projects]]
-  branch = "master"
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
@@ -115,6 +107,14 @@
   version = "v0.5.0"
 
 [[projects]]
+  digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
+  name = "github.com/inconshreveable/mousetrap"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
+  version = "v1.0"
+
+[[projects]]
   branch = "master"
   digest = "1:6d62fb66dd0a578569f2810928f3ff00baae524f94b8c3d859f1ac714bf4340d"
   name = "github.com/jimstudt/http-authentication"
@@ -165,14 +165,6 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "d2f86524cced5186554df90d92529757d22c1cb6"
-
-[[projects]]
-  branch = "master"
-  digest = "1:5174aab5f44cd1fd74261550332127cfb2a0c6b3f464bc10501747c718e6c862"
-  name = "github.com/mastercactapus/caddy-proxyprotocol"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5af98340cafa2a5010e1b8fa3b6d1bd69b3b59e0"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -332,6 +324,22 @@
   revision = "067529f716f4c3f5e37c8c95ddd59df1007290ae"
 
 [[projects]]
+  digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
+  name = "github.com/spf13/cobra"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ef82de70bb3f60c65fb8eebacbb2d122ef517385"
+  version = "v0.0.3"
+
+[[projects]]
+  digest = "1:dab83a1bbc7ad3d7a6ba1a1cc1760f25ac38cdf7d96a5cdd55cd915a4f5ceaf9"
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
+  version = "v1.0.2"
+
+[[projects]]
   digest = "1:fb11f8ddb212cf9aed430070b2c7141751c30b1b0811cbea1dedc28c9b1006da"
   name = "github.com/xenolf/lego"
   packages = ["acmev2"]
@@ -456,10 +464,10 @@
   analyzer-version = 1
   input-imports = [
     "github.com/captncraig/caddy-realip",
-    "github.com/mastercactapus/caddy-proxyprotocol",
     "github.com/mholt/caddy/caddy/caddymain",
     "github.com/miekg/caddy-prometheus",
     "github.com/pyed/ipfilter",
+    "github.com/spf13/cobra",
     "github.com/xuqingfeng/caddy-rate-limit",
   ]
   solver-name = "gps-cdcl"

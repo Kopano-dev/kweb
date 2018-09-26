@@ -1,8 +1,8 @@
 #!/usr/bin/python
 #
 # go-license-ranger. A simple script to generate a 3rd party license file out o
-# a Go dependency tree. Requires [glide](https://glide.sh) to find the
-# dependencies.
+# a Go dependency tree. Requires [glide](https://glide.sh) or
+# [dep](https://golang.github.io/dep/) to find the dependencies.
 #
 #
 # Copyright 2018 Kopano and its licensors
