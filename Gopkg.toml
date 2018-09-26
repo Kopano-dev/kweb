@@ -1,0 +1,17 @@
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+[prune]
+  go-tests = true
+  unused-packages = true
+
+[[constraint]]
+  name = "github.com/mholt/caddy"
+  branch = "master"
+
+[[override]]
+  name = "github.com/xenolf/lego"
+  revision = "fad2257e11ae4ff31ed03739386873aa405dec2d"
+
+[[override]]
+  name = "github.com/russross/blackfriday"
+  revision = "067529f716f4c3f5e37c8c95ddd59df1007290ae"
