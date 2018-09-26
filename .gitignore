@@ -1,0 +1,10 @@
+/vendor
+/bin
+/.gopath
+/golint.txt
+/govet.txt
+/dist
+/Caddyfile
+/test/tests.*
+/3rdparty-LICENSES.md
+
