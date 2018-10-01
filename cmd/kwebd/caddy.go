@@ -12,11 +12,15 @@ import (
 	"github.com/mholt/caddy/caddy/caddymain"
 	"github.com/spf13/cobra"
 
-	// Plugins.
+	// 3rd party plugins.
 	_ "github.com/captncraig/caddy-realip"
 	_ "github.com/miekg/caddy-prometheus"
 	_ "github.com/pyed/ipfilter"
 	_ "github.com/xuqingfeng/caddy-rate-limit"
+
+	// Our plugins.
+	_ "stash.kopano.io/kgol/kweb/caddy-configjson"
+	_ "stash.kopano.io/kgol/kweb/caddy-staticpwa"
 )
 
 func init() {
@@ -26,9 +30,9 @@ func init() {
 func commandCaddy() *cobra.Command {
 	caddyCmd := &cobra.Command{
 		Use:   "caddy [...args]",
-		Short: "Start caddy and listen for requests",
+		Short: "Start like caddy and listen for requests",
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := caddy(cmd, args); err != nil {
+			if err := caddyCommandHandler(cmd, args); err != nil {
 				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -39,7 +43,7 @@ func commandCaddy() *cobra.Command {
 	return caddyCmd
 }
 
-func caddy(cmd *cobra.Command, args []string) error {
+func caddyCommandHandler(cmd *cobra.Command, args []string) error {
 	// Reset args, since caddymain has its own parsing.
 	subArgs := append(os.Args[:1], args...)
 	os.Args = subArgs
