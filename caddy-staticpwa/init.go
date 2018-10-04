@@ -6,6 +6,8 @@
 package caddystaticpwa
 
 import (
+	"path/filepath"
+
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
@@ -33,8 +35,14 @@ func setup(c *caddy.Controller) error {
 		}
 		path := c.Val()
 
-		// Inject our middle ware.
 		cfg := httpserver.GetConfig(c)
+
+		if !filepath.IsAbs(path) {
+			// Relative paths are relative to the configured web root.
+			path = filepath.Join(cfg.Root, path)
+		}
+
+		// Inject our middle ware.
 		mid := func(next httpserver.Handler) httpserver.Handler {
 			return NewStaticPWAHandler(
 				url,

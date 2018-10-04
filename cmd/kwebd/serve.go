@@ -65,9 +65,6 @@ func serve(cmd *cobra.Command, args []string) error {
 	if quic, _ := cmd.Flags().GetBool("quic"); quic {
 		caddyArgs = append(caddyArgs, "-quic")
 	}
-	if root, _ := cmd.Flags().GetString("root"); root != "" {
-		caddyArgs = append(caddyArgs, "-root", root)
-	}
 	if validate, _ := cmd.Flags().GetBool("validate"); validate {
 		caddyArgs = append(caddyArgs, "-validate")
 	}
@@ -75,6 +72,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		caddyArgs = append(caddyArgs, "-revoke", revoke)
 	}
 
+	root, _ := cmd.Flags().GetString("root")
 	email, _ := cmd.Flags().GetString("email")
 	host, _ := cmd.Flags().GetString("host")
 	httpPort, _ := cmd.Flags().GetString("http-port")
@@ -86,7 +84,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	tlsCertBundle, _ := cmd.Flags().GetString("tls-cert-file")
 	tlsPrivateKey, _ := cmd.Flags().GetString("tls-key-file")
 
-	caddyArgs = append(caddyArgs, "-host", host, "-http-port", httpPort, "-https-port", httpsPort)
+	caddyArgs = append(caddyArgs, "-root", root, "-host", host, "-http-port", httpPort, "-https-port", httpsPort)
 	if tls {
 		caddyArgs = append(caddyArgs, "-port", httpsPort)
 	} else {
@@ -100,6 +98,8 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
+		Root: root,
+
 		Host:  host,
 		Email: email,
 

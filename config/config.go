@@ -7,6 +7,8 @@ package config
 
 // Config bundles a bunch of configuration settings.
 type Config struct {
+	Root string
+
 	Host  string
 	Email string
 
