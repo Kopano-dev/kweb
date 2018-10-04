@@ -7,8 +7,8 @@ package caddystaticpwa
 
 import (
 	"net/http"
+	"net/url"
 	"path"
-
 	"strings"
 
 	"github.com/mholt/caddy/caddyhttp/httpserver"
@@ -60,10 +60,12 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = upath
 	}
 	if upath == "/" {
-		url := r.RequestURI
+		// FIXME(longsleep): Inefficient, avoid additional parse. Rather
+		// do StropPrefix some place else or so.
+		ourl, _ := url.ParseRequestURI(r.RequestURI)
 		// Ensure we are called as path.
-		if !strings.HasSuffix(url, "/") {
-			localRedirect(w, r, path.Base(url)+"/")
+		if !strings.HasSuffix(ourl.Path, "/") {
+			localRedirect(w, r, path.Base(ourl.Path)+"/")
 			return
 		}
 		// If called as path, always serve index.html directly.
