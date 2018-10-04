@@ -77,15 +77,12 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 
 	// Handle headers.
 	headers := w.Header()
-	headers.Set("X-Content-Type-Options", "nosniff")
-	headers.Set("X-XSS-Protection", "1; mode=block")
-	headers.Set("X-Frame-Options", "sameorigin")
-	headers.Set("Referrer-Policy", "no-referrer")
-	headers.Set("Feature-Policy", "midi 'none'")
 
-	name := path.Clean(upath)
+	// Never send a referrer for pwas.
+	headers.Set("Referrer-Policy", "no-referrer")
 
 	// Routes.
+	name := path.Clean(upath)
 	switch name {
 	case indexPath:
 		// pass
