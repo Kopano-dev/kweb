@@ -464,7 +464,9 @@
   analyzer-version = 1
   input-imports = [
     "github.com/captncraig/caddy-realip",
+    "github.com/mholt/caddy",
     "github.com/mholt/caddy/caddy/caddymain",
+    "github.com/mholt/caddy/caddyhttp/httpserver",
     "github.com/miekg/caddy-prometheus",
     "github.com/pyed/ipfilter",
     "github.com/spf13/cobra",
