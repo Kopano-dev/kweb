@@ -6,20 +6,21 @@
 package caddystaticpwa
 
 import (
-	"bytes"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"path"
-	"strconv"
+
 	"strings"
 
 	"github.com/mholt/caddy/caddyhttp/httpserver"
-
-	"stash.kopano.io/kgol/kweb/nonce"
 )
 
 var nonceMarker = []byte("__CSP_NONCE__")
+
+const (
+	indexPath         = "/index.html"
+	webworkerPath     = "/service-worker.js"
+	assetManifestPath = "/asset-manifest.json"
+)
 
 // StaticPWAHandler is a handler for static progressive webapps.
 type StaticPWAHandler struct {
@@ -66,12 +67,45 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// If called as path, always serve index.html directly.
-		upath = "/index.html"
+		upath = indexPath
 		r.URL.Path = upath
 	}
 
+	// Handle headers.
+	headers := w.Header()
+	headers.Set("X-Content-Type-Options", "nosniff")
+	headers.Set("X-XSS-Protection", "1; mode=block")
+	headers.Set("X-Frame-Options", "sameorigin")
+	headers.Set("Referrer-Policy", "no-referrer")
+	headers.Set("Feature-Policy", "midi 'none'")
+
 	name := path.Clean(upath)
 
+	// Routes.
+	switch name {
+	case indexPath:
+		// pass
+
+	case webworkerPath:
+		fallthrough
+	case assetManifestPath:
+		// No caching.
+		headers.Set("Cache-Control", "public, max-age=0")
+		headers.Set("Content-Type", "application/javascript")
+
+	default:
+		if strings.HasPrefix(name, "/static/") {
+			// Long term caching for static resources.
+			headers.Set("Cache-Control", "public, max-age=31536000")
+			headers.Set("Content-Security-Policy", "default-src 'self'")
+
+		} else {
+			// Handle rest with index (it is propably client side URL routing).
+			name = "/index.html"
+		}
+	}
+
+	// Open file.
 	f, err := h.fs.Open(name)
 	if err != nil {
 		msg, code := toHTTPError(err)
@@ -93,55 +127,11 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Handle headers.
-	headers := w.Header()
-	headers.Set("X-Content-Type-Options", "nosniff")
-	headers.Set("X-XSS-Protection", "1; mode=block")
-	headers.Set("X-Frame-Options", "sameorigin")
-	headers.Set("Referrer-Policy", "no-referrer")
-	headers.Set("Feature-Policy", "midi 'none'")
-
+	// Handle content.
 	switch name {
-	case "/index.html":
-		index, err := ioutil.ReadAll(f)
-		if err != nil {
-			http.Error(w, "500 failed to load app", http.StatusInternalServerError)
-			return
-		}
-
-		// Nonce.
-		n := nonce.New()
-		// NOTE(longsleep): This is not particularly efficient.
-		content := bytes.Replace(index, nonceMarker, n, 1)
-		sendSize := int64(len(content))
-
-		// CSP and no caching.
-		headers.Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; style-src 'self' 'nonce-%s'; base-uri 'none'", string(n)))
-		headers.Set("Cache-Control", "private, max-age=0")
-
-		// Directly return data from replaced content.
-		headers.Set("Content-Type", "text/html; charset=utf-8")
-		headers.Set("Accept-Ranges", "none")
-		headers.Set("Content-Length", strconv.FormatInt(sendSize, 10))
-		w.WriteHeader(http.StatusOK)
-		if r.Method != "HEAD" {
-			w.Write(content)
-		}
-		return
-
-	case "/service-worker.js":
-		// No caching.
-		headers.Set("Cache-Control", "public, max-age=0")
-		headers.Set("Content-Type", "application/javascript")
-
+	case indexPath:
+		handleIndex(w, r, f)
 	default:
-		if strings.HasPrefix(name, "/static/") {
-			// Long term caching for static resources.
-			headers.Set("Cache-Control", "public, max-age=31536000")
-			headers.Set("Content-Security-Policy", "default-src 'self'")
-		}
+		http.ServeContent(w, r, d.Name(), d.ModTime(), f)
 	}
-
-	// Serve content.
-	http.ServeContent(w, r, d.Name(), d.ModTime(), f)
 }
