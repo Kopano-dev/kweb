@@ -6,13 +6,24 @@
 package caddyconfigjson
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
-var emptyJSON = []byte("{}")
+// VersionStamp is the version added to config JSON kweb.v key.
+const VersionStamp = 20181004
+
+const grapiPrefix = "/api/gc/v1"
+
+var defaultJSON = []byte(fmt.Sprintf(`{
+  "apiPrefix": %s,
+  "kweb": {
+    "v": %d
+  }
+}`, grapiPrefix, VersionStamp))
 
 // ConfigJSONHandler is a handler to return config JSON files.
 type ConfigJSONHandler struct {
@@ -66,5 +77,5 @@ func (h *ConfigJSONHandler) handle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	w.WriteHeader(http.StatusOK)
-	w.Write(emptyJSON)
+	w.Write(defaultJSON)
 }
