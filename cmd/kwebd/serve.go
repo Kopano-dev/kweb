@@ -13,7 +13,7 @@ import (
 	"github.com/mholt/caddy/caddy/caddymain"
 	"github.com/spf13/cobra"
 
-	"stash.kopano.io/kgol/kweb"
+	"stash.kopano.io/kgol/kweb/config"
 )
 
 func commandServe() *cobra.Command {
@@ -45,6 +45,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("tls-protocols", "tls1.2 tls1.2", "Min and max TLS protocol")
 	serveCmd.Flags().String("tls-cert-file", "", "Path to TLS certificate bundle (concatenation of the server's certificate followed by the CA's certificate chain)")
 	serveCmd.Flags().String("tls-key-file", "", "Path to the server's private key file which matches the certificate bundle")
+	serveCmd.Flags().String("reverse-proxy-legacy-http", "", "URL to reverse proxy requests for Webapp and Z-Push")
 
 	return serveCmd
 }
@@ -95,8 +96,10 @@ func serve(cmd *cobra.Command, args []string) error {
 		caddyArgs = append(caddyArgs, "-email", email)
 	}
 
+	reverseProxyLegacyHTTP, _ := cmd.Flags().GetString("reverse-proxy-legacy-http")
+
 	// Configure underlying caddy.
-	config := &kweb.Config{
+	cfg := &config.Config{
 		Host:  host,
 		Email: email,
 
@@ -106,8 +109,10 @@ func serve(cmd *cobra.Command, args []string) error {
 		TLSPrivateKey:     tlsPrivateKey,
 		TLSMustStaple:     tlsMustStaple,
 		TLSProtocols:      tlsProtocols,
+
+		ReverseProxyLegacyHTTP: reverseProxyLegacyHTTP,
 	}
-	caddy.SetDefaultCaddyfileLoader("default", defaultLoader(config))
+	caddy.SetDefaultCaddyfileLoader("default", defaultLoader(cfg))
 
 	// Reset args, since caddymain has its own parsing.
 	subArgs := append(os.Args[:1], caddyArgs...)
@@ -118,9 +123,9 @@ func serve(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func defaultLoader(config *kweb.Config) caddy.LoaderFunc {
+func defaultLoader(cfg *config.Config) caddy.LoaderFunc {
 	return caddy.LoaderFunc(func(serverType string) (caddy.Input, error) {
-		contents, err := kweb.Caddyfile(config)
+		contents, err := config.Caddyfile(cfg)
 		if err != nil {
 			return nil, err
 		}

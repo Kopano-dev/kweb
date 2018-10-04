@@ -3,14 +3,13 @@
  * Copyright 2018 Kopano and its licensors
  */
 
-package kweb
+package config
 
 import (
-	"bytes"
-	"fmt"
+	"io"
 )
 
-var caddyfile = []byte(`
+var base = []byte(`
 errors stderr
 log stdout
 
@@ -111,70 +110,9 @@ staticpwa /mail ./mail-webapp
 staticpwa /contacts ./contacts-webapp
 `)
 
-// Config bundles a bunch of configuration settings.
-type Config struct {
-	Host  string
-	Email string
+func writeBaseToCaddyfile(cfg *Config, w io.Writer) error {
+	// Add base.
+	_, err := w.Write(base)
 
-	TLSEnable         bool
-	TLSAlwaysSelfSign bool
-	TLSCertBundle     string
-	TLSPrivateKey     string
-	TLSKeyType        string
-	TLSProtocols      string
-	TLSMustStaple     bool
-}
-
-// Caddyfile returns a functional caddy file representing our config.
-func Caddyfile(config *Config) ([]byte, error) {
-	var buf = &bytes.Buffer{}
-
-	// Add host.
-	buf.WriteString(config.Host)
-	buf.WriteString("\n\n")
-
-	// TLS setup
-	if !config.TLSEnable {
-		buf.WriteString("tls off\n\n")
-	} else if (config.Email != "" || (config.TLSCertBundle != "" && config.TLSPrivateKey != "")) && !config.TLSAlwaysSelfSign {
-		buf.WriteString("tls")
-		if config.TLSCertBundle != "" && config.TLSPrivateKey != "" {
-			buf.WriteString(" ")
-			buf.WriteString(config.TLSCertBundle)
-			buf.WriteString(" ")
-			buf.WriteString(config.TLSPrivateKey)
-		}
-		buf.WriteString(" {\n")
-		if config.TLSProtocols != "" {
-			buf.WriteString("protocols ")
-			buf.WriteString(config.TLSProtocols)
-			buf.WriteString("\n")
-		}
-		if config.TLSMustStaple {
-			buf.WriteString("must-staple\n")
-		}
-		if config.TLSKeyType != "" {
-			buf.WriteString("key_type ")
-			buf.WriteString(config.TLSKeyType)
-			buf.WriteString("\n")
-		}
-		buf.WriteString("}\n\n")
-	} else {
-		buf.WriteString("tls self_signed {\n")
-		if config.TLSKeyType != "" {
-			buf.WriteString("key_type ")
-			buf.WriteString(config.TLSKeyType)
-			buf.WriteString("\n")
-		}
-		buf.WriteString("}\n\n")
-	}
-
-	// Add routes.
-	buf.Write(caddyfile)
-
-	// Debug`
-	fmt.Printf("--- cfg start ---\n%s\n-- cfg end --\n", buf.String())
-
-	// Return created config.
-	return buf.Bytes(), nil
+	return err
 }
