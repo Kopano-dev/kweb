@@ -16,7 +16,7 @@ import (
 	"stash.kopano.io/kgol/kweb/nonce"
 )
 
-func handleIndex(w http.ResponseWriter, r *http.Request, f io.ReadSeeker) {
+func (h *StaticPWAHandler) handleIndex(w http.ResponseWriter, r *http.Request, f io.ReadSeeker) {
 	index, err := ioutil.ReadAll(f)
 	if err != nil {
 		http.Error(w, "500 failed to load app", http.StatusInternalServerError)
@@ -29,9 +29,20 @@ func handleIndex(w http.ResponseWriter, r *http.Request, f io.ReadSeeker) {
 	content := bytes.Replace(index, nonceMarker, n, 1)
 	sendSize := int64(len(content))
 
+	// Compute host source for websocket connections since this is not covered
+	// by 'self' as it is another scheme.
+	connectSource := "wss://"
+	if h.host == "" {
+		// No host set - this is potentically insecure if no other validation
+		// of the incoming host header takes places.
+		connectSource += r.Host
+	} else {
+		connectSource += h.host
+	}
+
 	// CSP and no caching.
 	headers := w.Header()
-	headers.Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; style-src 'self' 'nonce-%s'; base-uri 'none'", string(n)))
+	headers.Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; style-src 'self' 'nonce-%s'; base-uri 'none'; connect-src 'self' %s", string(n), connectSource))
 	headers.Set("Cache-Control", "private, max-age=0")
 
 	// Directly return data from replaced content.

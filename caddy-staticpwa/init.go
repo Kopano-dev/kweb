@@ -6,6 +6,7 @@
 package caddystaticpwa
 
 import (
+	"net"
 	"path/filepath"
 
 	"github.com/mholt/caddy"
@@ -42,9 +43,23 @@ func setup(c *caddy.Controller) error {
 			path = filepath.Join(cfg.Root, path)
 		}
 
+		host := cfg.Host()
+		ip := net.ParseIP(host)
+		if ip != nil {
+			// Not an IP address - assume it is a hostname.
+			host = ""
+		} else {
+			port := cfg.Port()
+			if port != "443" && port != "80" {
+				// Add port when not standard.
+				host += ":" + port
+			}
+		}
+
 		// Inject our middle ware.
 		mid := func(next httpserver.Handler) httpserver.Handler {
 			return NewStaticPWAHandler(
+				host,
 				url,
 				path,
 				next,

@@ -24,6 +24,7 @@ const (
 
 // StaticPWAHandler is a handler for static progressive webapps.
 type StaticPWAHandler struct {
+	host    string
 	appURL  string
 	handler http.Handler
 	fs      http.Dir
@@ -32,8 +33,9 @@ type StaticPWAHandler struct {
 }
 
 // NewStaticPWAHandler creates a new StaticPWAHandler with the provided options.
-func NewStaticPWAHandler(appURL, path string, next httpserver.Handler) *StaticPWAHandler {
+func NewStaticPWAHandler(host, appURL, path string, next httpserver.Handler) *StaticPWAHandler {
 	h := &StaticPWAHandler{
+		host:   host,
 		appURL: appURL,
 		fs:     http.Dir(path),
 
@@ -132,7 +134,7 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 	// Handle content.
 	switch name {
 	case indexPath:
-		handleIndex(w, r, f)
+		h.handleIndex(w, r, f)
 	default:
 		http.ServeContent(w, r, d.Name(), d.ModTime(), f)
 	}
