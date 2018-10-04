@@ -16,10 +16,11 @@ func Caddyfile(config *Config) ([]byte, error) {
 	var err error
 
 	// Add host.
-	err = writeHostToCaddyfile(config, buf)
+	err = writeHostStartToCaddyfile(config, buf)
 	if err != nil {
 		return nil, err
 	}
+
 	// Add bind.
 	err = writeBindToCaddyfile(config, buf)
 	if err != nil {
@@ -46,8 +47,13 @@ func Caddyfile(config *Config) ([]byte, error) {
 		return nil, err
 	}
 
-	// Add extra config (keep at the end).
+	// Add extra config (keep second last).
 	err = writeExtraToCaddyfile(config, buf)
+	if err != nil {
+		return nil, err
+	}
+	// Finish host (keep at the end)
+	err = writeHostEndToCaddyfile(config, buf)
 	if err != nil {
 		return nil, err
 	}

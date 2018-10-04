@@ -9,10 +9,16 @@ import (
 	"bytes"
 )
 
-func writeHostToCaddyfile(config *Config, buf *bytes.Buffer) error {
+func writeHostStartToCaddyfile(config *Config, buf *bytes.Buffer) error {
 	// Add host.
 	buf.WriteString(config.Host)
-	buf.WriteString("\n\n")
+	buf.WriteString(" {\n\n")
+
+	return nil
+}
+
+func writeHostEndToCaddyfile(config *Config, buf *bytes.Buffer) error {
+	buf.WriteString("\n}\n\n")
 
 	return nil
 }
