@@ -13,6 +13,8 @@ type Config struct {
 	Host  string
 	Email string
 
+	RequestLog string
+
 	TLSEnable         bool
 	TLSAlwaysSelfSign bool
 	TLSCertBundle     string

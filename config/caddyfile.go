@@ -21,6 +21,11 @@ func Caddyfile(config *Config) ([]byte, error) {
 		return nil, err
 	}
 
+	// Add log.
+	err = writeLogToCaddyfile(config, buf)
+	if err != nil {
+		return nil, err
+	}
 	// Add bind.
 	err = writeBindToCaddyfile(config, buf)
 	if err != nil {

@@ -11,7 +11,6 @@ import (
 
 var base = []byte(`
 errors stderr
-log / stdout {combined}
 
 gzip
 
