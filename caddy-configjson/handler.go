@@ -19,7 +19,7 @@ const VersionStamp = 20181004
 const grapiPrefix = "/api/gc/v1"
 
 var defaultJSON = []byte(fmt.Sprintf(`{
-  "apiPrefix": %s,
+  "apiPrefix": "%s",
   "kweb": {
     "v": %d
   }
