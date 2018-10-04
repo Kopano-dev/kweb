@@ -23,4 +23,6 @@ type Config struct {
 
 	ReverseProxyLegacyHTTP string
 	DefaultRedirect        string
+
+	Extra []byte
 }

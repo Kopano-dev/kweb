@@ -7,7 +7,9 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddy/caddymain"
@@ -48,6 +50,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("tls-key-file", "", "Path to the server's private key file which matches the certificate bundle")
 	serveCmd.Flags().String("reverse-proxy-legacy-http", "", "URL to reverse proxy requests for Webapp and Z-Push")
 	serveCmd.Flags().String("default-redirect", "", "URL to redirect to when no other path is given (/)")
+	serveCmd.Flags().String("extra", "", "Extra configuration file (append at the end)")
 
 	return serveCmd
 }
@@ -99,6 +102,7 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	reverseProxyLegacyHTTP, _ := cmd.Flags().GetString("reverse-proxy-legacy-http")
 	defaultRedirect, _ := cmd.Flags().GetString("default-redirect")
+	extraFile, _ := cmd.Flags().GetString("extra")
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
@@ -118,6 +122,17 @@ func serve(cmd *cobra.Command, args []string) error {
 		ReverseProxyLegacyHTTP: reverseProxyLegacyHTTP,
 		DefaultRedirect:        defaultRedirect,
 	}
+
+	// Conditionals.
+	if extraFile != "" {
+		extra, err := ioutil.ReadFile(path.Clean(extraFile))
+		if err != nil {
+			return fmt.Errorf("failed to read extra file: %v", err)
+		}
+		cfg.Extra = extra
+	}
+
+	// Set as default loader.
 	caddy.SetDefaultCaddyfileLoader("default", defaultLoader(cfg))
 
 	// Reset args, since caddymain has its own parsing.
