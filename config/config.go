@@ -22,6 +22,7 @@ type Config struct {
 	TLSKeyType        string
 	TLSProtocols      string
 	TLSMustStaple     bool
+	HSTS              string
 
 	ReverseProxyLegacyHTTP string
 	DefaultRedirect        string

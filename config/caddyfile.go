@@ -31,6 +31,11 @@ func Caddyfile(config *Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Add security headers.
+	err = writeSecurityHeadersToCaddyfile(config, buf)
+	if err != nil {
+		return nil, err
+	}
 	// Add TLS.
 	err = writeTLSToCaddyfile(config, buf)
 	if err != nil {
