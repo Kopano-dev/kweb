@@ -39,6 +39,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("host", "0.0.0.0", "Hostname to serve")
 	serveCmd.Flags().String("http-port", "80", "Port to use for HTTP")
 	serveCmd.Flags().String("https-port", "443", "Port to use for HTTPS")
+	serveCmd.Flags().String("bind", "", "IP to bind listener to (default \"0.0.0.0\")")
 	serveCmd.Flags().Bool("tls", true, "Enable TLS on listener")
 	serveCmd.Flags().Bool("tls-always-self-sign", false, "Always generate self signed certificate")
 	serveCmd.Flags().Bool("tls-must-staple", false, "Enable TLS must staple")
@@ -46,6 +47,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("tls-cert-file", "", "Path to TLS certificate bundle (concatenation of the server's certificate followed by the CA's certificate chain)")
 	serveCmd.Flags().String("tls-key-file", "", "Path to the server's private key file which matches the certificate bundle")
 	serveCmd.Flags().String("reverse-proxy-legacy-http", "", "URL to reverse proxy requests for Webapp and Z-Push")
+	serveCmd.Flags().String("default-redirect", "", "URL to redirect to when no other path is given (/)")
 
 	return serveCmd
 }
@@ -77,6 +79,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	host, _ := cmd.Flags().GetString("host")
 	httpPort, _ := cmd.Flags().GetString("http-port")
 	httpsPort, _ := cmd.Flags().GetString("https-port")
+	bind, _ := cmd.Flags().GetString("bind")
 	tls, _ := cmd.Flags().GetBool("tls")
 	tlsAlwaysSelfSign, _ := cmd.Flags().GetBool("tls-always-self-sign")
 	tlsMustStaple, _ := cmd.Flags().GetBool("tls-must-staple")
@@ -95,11 +98,13 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 
 	reverseProxyLegacyHTTP, _ := cmd.Flags().GetString("reverse-proxy-legacy-http")
+	defaultRedirect, _ := cmd.Flags().GetString("default-redirect")
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
 		Root: root,
 
+		Bind:  bind,
 		Host:  host,
 		Email: email,
 
@@ -111,6 +116,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		TLSProtocols:      tlsProtocols,
 
 		ReverseProxyLegacyHTTP: reverseProxyLegacyHTTP,
+		DefaultRedirect:        defaultRedirect,
 	}
 	caddy.SetDefaultCaddyfileLoader("default", defaultLoader(cfg))
 

@@ -20,6 +20,11 @@ func Caddyfile(config *Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Add bind.
+	err = writeBindToCaddyfile(config, buf)
+	if err != nil {
+		return nil, err
+	}
 	// Add TLS.
 	err = writeTLSToCaddyfile(config, buf)
 	if err != nil {
@@ -32,6 +37,11 @@ func Caddyfile(config *Config) ([]byte, error) {
 	}
 	// Add legacy.
 	err = writeLegacyToCaddyfile(config, buf)
+	if err != nil {
+		return nil, err
+	}
+	// Add defaults.
+	err = writeDefaultsToCaddyfile(config, buf)
 	if err != nil {
 		return nil, err
 	}

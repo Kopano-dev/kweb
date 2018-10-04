@@ -9,6 +9,7 @@ package config
 type Config struct {
 	Root string
 
+	Bind  string
 	Host  string
 	Email string
 
@@ -21,4 +22,5 @@ type Config struct {
 	TLSMustStaple     bool
 
 	ReverseProxyLegacyHTTP string
+	DefaultRedirect        string
 }
