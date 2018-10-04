@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/mholt/caddy"
 	"github.com/mholt/caddy/caddy/caddymain"
@@ -139,6 +140,9 @@ func serve(cmd *cobra.Command, args []string) error {
 		cfg.Extra = extra
 	}
 
+	// Setup caddy.
+	setupAssetsPath()
+
 	// Set as default loader.
 	caddy.SetDefaultCaddyfileLoader("default", defaultLoader(cfg))
 
@@ -163,4 +167,15 @@ func defaultLoader(cfg *config.Config) caddy.LoaderFunc {
 			ServerTypeName: serverType,
 		}, nil
 	})
+}
+
+func setupAssetsPath() string {
+	ap := os.Getenv("KOPANO_KWEB_ASSETS_PATH")
+	if ap == "" {
+		home := os.Getenv("HOME")
+		ap = filepath.Join(home, ".kweb")
+	}
+
+	os.Setenv("CADDYPATH", ap)
+	return ap
 }
