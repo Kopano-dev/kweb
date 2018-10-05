@@ -14,9 +14,9 @@ import (
 
 	// 3rd party plugins.
 	_ "github.com/captncraig/caddy-realip"
-	_ "github.com/miekg/caddy-prometheus"
 	_ "github.com/pyed/ipfilter"
 	_ "github.com/xuqingfeng/caddy-rate-limit"
+	_ "stash.kopano.io/kgol/caddy-prometheus"
 
 	// Our plugins.
 	_ "stash.kopano.io/kgol/kweb/caddy-configjson"

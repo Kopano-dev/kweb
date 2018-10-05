@@ -222,14 +222,6 @@
   revision = "13f9c34d161693c1c0828fea3750d01c068174b6"
 
 [[projects]]
-  branch = "master"
-  digest = "1:f2607fc5c975ee4c3662eeacec423e20215fe97ac1958082b921757a719d798c"
-  name = "github.com/miekg/caddy-prometheus"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "9329aaa9305e1381937f8de1878b5d6662a96014"
-
-[[projects]]
   digest = "1:b39aee4261f1ae13fdd21a0db189e0bba0f96c0f2eba77ab278428e2d3b00052"
   name = "github.com/miekg/dns"
   packages = ["."]
@@ -459,6 +451,14 @@
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
+[[projects]]
+  branch = "master"
+  digest = "1:ddd6025e7c121a0b762100f3be540ba66c579adaef8aef2940cd09c34ed87f6c"
+  name = "stash.kopano.io/kgol/caddy-prometheus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c1fd8df19442caad8012d90fb5e458852b25402c"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -467,10 +467,10 @@
     "github.com/mholt/caddy",
     "github.com/mholt/caddy/caddy/caddymain",
     "github.com/mholt/caddy/caddyhttp/httpserver",
-    "github.com/miekg/caddy-prometheus",
     "github.com/pyed/ipfilter",
     "github.com/spf13/cobra",
     "github.com/xuqingfeng/caddy-rate-limit",
+    "stash.kopano.io/kgol/caddy-prometheus",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
