@@ -16,6 +16,14 @@ import (
 	"stash.kopano.io/kgol/kweb/nonce"
 )
 
+const indexCSPTemplate = "default-src 'self'; " +
+	"style-src 'self' 'nonce-%s'; " + // Random nonce.
+	"base-uri 'none'; " +
+	"object-src 'none'; " + // Disabled for security - no crap in our house.
+	"connect-src 'self' %s; " + // Additional connect urls.
+	"img-src 'self' data:; " + // NOTE(longsleep): We need data image URLs for now.
+	"frame-ancestors 'self'" // NOTE(longsleep): Better than X-Frame-Options since this goes up to the top frame.
+
 func (h *StaticPWAHandler) handleIndex(w http.ResponseWriter, r *http.Request, f io.ReadSeeker) {
 	index, err := ioutil.ReadAll(f)
 	if err != nil {
@@ -42,7 +50,7 @@ func (h *StaticPWAHandler) handleIndex(w http.ResponseWriter, r *http.Request, f
 
 	// CSP and no caching.
 	headers := w.Header()
-	headers.Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; style-src 'self' 'nonce-%s'; base-uri 'none'; connect-src 'self' %s", string(n), connectSource))
+	headers.Set("Content-Security-Policy", fmt.Sprintf(indexCSPTemplate, string(n), connectSource))
 	headers.Set("Cache-Control", "private, max-age=0")
 
 	// Directly return data from replaced content.
