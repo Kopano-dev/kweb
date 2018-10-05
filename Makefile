@@ -129,6 +129,9 @@ dist: 3rdparty-LICENSES.md ; $(info building dist tarball ...)
 	cp -avf ../README.md "${PACKAGE_NAME}-${VERSION}" && \
 	cp -avf ../3rdparty-LICENSES.md "${PACKAGE_NAME}-${VERSION}" && \
 	cp -avf ../bin/* "${PACKAGE_NAME}-${VERSION}" && \
+	cp -avf ../scripts/kopano-kwebd.binscript "${PACKAGE_NAME}-${VERSION}/scripts" && \
+	cp -avf ../scripts/kopano-kwebd.service "${PACKAGE_NAME}-${VERSION}/scripts" && \
+	cp -avf ../scripts/kwebd.cfg "${PACKAGE_NAME}-${VERSION}/scripts" && \
 	tar --owner=0 --group=0 -czvf ${PACKAGE_NAME}-${VERSION}.tar.gz "${PACKAGE_NAME}-${VERSION}" && \
 	cd ..
 

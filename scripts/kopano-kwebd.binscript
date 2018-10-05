@@ -1,0 +1,156 @@
+#!/bin/sh
+#
+# Kopano Web Daemon (kwebd) launcher
+#
+# License: AGPL-3.0-only
+# Copyright 2018 Kopano and its licensors
+#
+
+set -e
+
+# Base defines.
+
+EXE=/usr/libexec/kopano/kwebd
+DEFAULT_WEB_ROOT=/usr/share/kopano-kweb/www
+DEFAULT_HTTPS_PORT=443
+DEFAULT_HTTP_PORT=80
+DEFAULT_HTTPS_PORT_ALTERNATE=9443
+DEFAULT_HTTP_PORT_ALTERNATE=9080
+DEFAULT_ASSETS_PATH=/etc/kopano/kweb/.kweb
+DEFAULT_EXTRA_CONFIG=/etc/kopano/kweb/extra.d/extra.cfg
+
+setup_env() {
+	# Plugin kwebd environment.
+	if [ -z "$KOPANO_KWEB_ASSETS_PATH" ]; then
+		export KOPANO_KWEB_ASSETS_PATH="$DEFAULT_ASSETS_PATH"
+	fi
+}
+
+# Handle parameters for configuration.
+
+case "${1}" in
+	setup)
+		# Setup.
+		export SETUP=1
+
+		# Initialize environment.
+		setup_env
+
+		if [ ! -e "$KOPANO_KWEB_ASSETS_PATH" -a -n "$USER" ]; then
+			mkdir -p "$KOPANO_KWEB_ASSETS_PATH" && chown "$USER" "$KOPANO_KWEB_ASSETS_PATH"
+		fi
+
+		if [ -n "$request_log_file" -a -n "$USER" ]; then
+			mkdir -p "$(dirname ${request_log_file})"
+			touch -a "$request_log_file" && chown "$USER" "$request_log_file"
+		fi
+
+		# Setup subcommand does nothing.
+		exit 0
+
+		;;
+
+	serve)
+		# Inject values from environment into command line. This is mainly used
+		# when this script is run from systemd or docker.
+
+		# kwebd basics
+
+		if [ -z "$web_root" ]; then
+			web_root="$DEFAULT_WEB_ROOT"
+		fi
+
+		if [ -z "$https_port" ]; then
+			if [ -z "$hostname" ]; then
+				https_port=$DEFAULT_HTTPS_PORT_ALTERNATE
+			else
+				https_port=$DEFAULT_HTTPS_PORT
+			fi
+		fi
+
+		if [ -z "$http_port" ]; then
+			if [ -z "$hostname" ]; then
+				http_port=$DEFAULT_HTTP_PORT_ALTERNATE
+			else
+				http_port=$DEFAULT_HTTP_PORT
+			fi
+		fi
+
+		if [ -n "$request_log_file" ]; then
+			set -- "$@" --request_log="$request_log_file"
+		fi
+
+		if [ -n "$hostname" ]; then
+			set -- "$@" --host="$hostname"
+		fi
+
+		if [ -n "$tls_acme_email" ]; then
+			set -- "$@" --email="$tls_acme_email"
+		fi
+
+		if [ "$tls_acme_agree" = "yes" ]; then
+			set -- "$@" --agree
+		fi
+
+		if [ -n "$tls_acme_ca" ]; then
+			set -- "$@" --ca="$tls_acme_ca"
+		fi
+
+		if [ -n "$hsts" ]; then
+			set -- "$@" --hsts="$hsts"
+		fi
+
+		if [ -n "$bind" ]; then
+			set -- "$@" --bind="$bind"
+		fi
+
+		if [ -n "$tls" -a "$http2" != "yes" ]; then
+			set -- "$@" --http2=false
+		fi
+
+		if [ "$quic" = "yes" ]; then
+			set -- "$@" --quic
+		fi
+
+		if [ -n "$tls" -a "$tls" != "yes" ]; then
+			set -- "$@" --tls=false
+		fi
+
+		if [ -n "$tls_cert" ]; then
+			set -- "$@" --tls-cert-file="$tls_cert"
+		fi
+
+		if [ -n "$tls_key" ]; then
+			set -- "$@" --tls-key-file="$tls_key"
+		fi
+
+		if [ -n "$tls_protocols" ]; then
+			set -- "$@" --tls-protocols="$tls_protocols"
+		fi
+
+		if [ "$tls_always_self_sign" = "yes" ]; then
+			set -- "$@" --tls-always-self-sign
+		fi
+
+		if [ "$tls_must_staple" = "yes" ]; then
+			set -- "$@" --tls-must-staple
+		fi
+
+		set -- "$@" --root="$web_root" --http-port="$http_port" --https-port="$https_port"
+
+		# Initialize environment.
+		setup_env
+
+		;;
+
+	*)
+		;;
+esac
+
+# Set executable.
+
+set -- ${EXE} "$@"
+
+# Run.
+
+exec "$@"

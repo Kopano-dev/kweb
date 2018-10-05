@@ -39,7 +39,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("root", ".", "Path to web root")
 	serveCmd.Flags().Bool("validate", false, "Parse and validate the configuration but do not start the server")
 	serveCmd.Flags().String("revoke", "", "Hostname for which to revoke the certificate")
-	serveCmd.Flags().String("request-log", "stdout", "Log destination for request logging")
+	serveCmd.Flags().String("request-log", "", "Log destination for request logging")
 	serveCmd.Flags().String("host", "0.0.0.0", "Hostname to serve")
 	serveCmd.Flags().String("http-port", "80", "Port to use for HTTP")
 	serveCmd.Flags().String("https-port", "443", "Port to use for HTTPS")
