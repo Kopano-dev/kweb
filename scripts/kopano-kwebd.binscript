@@ -81,7 +81,7 @@ case "${1}" in
 		fi
 
 		if [ -n "$request_log_file" ]; then
-			set -- "$@" --request_log="$request_log_file"
+			set -- "$@" --request-log="$request_log_file"
 		fi
 
 		if [ -n "$hostname" ]; then
