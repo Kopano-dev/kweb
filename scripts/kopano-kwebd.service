@@ -27,7 +27,6 @@ Environment=KOPANO_KWEB_ASSETS_PATH=/etc/kopano/kweb/.kweb
 EnvironmentFile=-/etc/kopano/kwebd.cfg
 ExecStartPre=/usr/sbin/kopano-kwebd setup
 ExecStart=/usr/sbin/kopano-kwebd serve
-ExecReload=/bin/kill -USR1 $MAINPID
 
 [Install]
 WantedBy=multi-user.target
