@@ -18,11 +18,15 @@ DEFAULT_HTTPS_PORT_ALTERNATE=9443
 DEFAULT_HTTP_PORT_ALTERNATE=9080
 DEFAULT_ASSETS_PATH=/etc/kopano/kweb/.kweb
 DEFAULT_EXTRA_CONFIG=/etc/kopano/kweb/extra.d/extra.cfg
+DEFAULT_STATICPWA_PATH_PATTERN=/usr/share/kopano-%name/%path
 
 setup_env() {
-	# Plugin kwebd environment.
 	if [ -z "$KOPANO_KWEB_ASSETS_PATH" ]; then
 		export KOPANO_KWEB_ASSETS_PATH="$DEFAULT_ASSETS_PATH"
+	fi
+
+	if [ -z "$STATICPWA_PATH_PATTERN" ]; then
+		export STATICPWA_PATH_PATTERN="DEFAULT_STATICPWA_PATH_PATTERN"
 	fi
 }
 

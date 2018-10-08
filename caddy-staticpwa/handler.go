@@ -8,7 +8,9 @@ package caddystaticpwa
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/mholt/caddy/caddyhttp/httpserver"
@@ -33,7 +35,20 @@ type StaticPWAHandler struct {
 }
 
 // NewStaticPWAHandler creates a new StaticPWAHandler with the provided options.
-func NewStaticPWAHandler(host, appURL, path string, next httpserver.Handler) *StaticPWAHandler {
+func NewStaticPWAHandler(host, root, name, appURL, path string, next httpserver.Handler) *StaticPWAHandler {
+	if !filepath.IsAbs(path) {
+		// Use a pre configured pattern or are relative to the configured web
+		// root.
+		pattern := os.Getenv("STATICPWA_PATH_PATTERN")
+		if pattern != "" {
+			patternPath := strings.Replace(pattern, "%name", name, -1)
+			patternPath = strings.Replace(patternPath, "%path", path, -1)
+			path = filepath.Clean(patternPath)
+		} else {
+			path = filepath.Join(root, path)
+		}
+	}
+
 	h := &StaticPWAHandler{
 		host:   host,
 		appURL: appURL,
