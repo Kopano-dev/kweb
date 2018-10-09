@@ -16,14 +16,6 @@ import (
 	"stash.kopano.io/kgol/kweb/nonce"
 )
 
-const indexCSPTemplate = "default-src 'self'; " +
-	"style-src 'self' 'nonce-%s'; " + // Random nonce.
-	"base-uri 'none'; " +
-	"object-src 'none'; " + // Disabled for security - no crap in our house.
-	"connect-src 'self' %s; " + // Additional connect urls.
-	"img-src 'self' data:; " + // NOTE(longsleep): We need data image URLs for now.
-	"frame-ancestors 'self'" // NOTE(longsleep): Better than X-Frame-Options since this goes up to the top frame.
-
 func (h *StaticPWAHandler) handleIndex(w http.ResponseWriter, r *http.Request, f io.ReadSeeker) {
 	index, err := ioutil.ReadAll(f)
 	if err != nil {

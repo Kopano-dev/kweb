@@ -113,7 +113,11 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(name, "/static/") {
 			// Long term caching for static resources.
 			headers.Set("Cache-Control", "public, max-age=31536000")
-			headers.Set("Content-Security-Policy", "default-src 'self'")
+			if strings.HasSuffix(name, ".svg") {
+				headers.Set("Content-Security-Policy", staticSVGCSP)
+			} else {
+				headers.Set("Content-Security-Policy", staticDefaultCSP)
+			}
 
 		} else {
 			// Handle rest with index (it is propably client side URL routing).
