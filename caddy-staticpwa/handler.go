@@ -22,6 +22,11 @@ const (
 	indexPath         = "/index.html"
 	webworkerPath     = "/service-worker.js"
 	assetManifestPath = "/asset-manifest.json"
+	clientRoute       = "/r"
+
+	clientRoutePrefix      = clientRoute + "/"
+	precacheManifestPrefix = "/precache-manifest."
+	staticPrefix           = "/static/"
 )
 
 // StaticPWAHandler is a handler for static progressive webapps.
@@ -96,37 +101,53 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 	// Never send a referrer for pwas.
 	headers.Set("Referrer-Policy", "no-referrer")
 
-	// Routes.
+	// What to open.
 	name := path.Clean(upath)
-	switch name {
-	case indexPath:
-		// pass
 
-	case webworkerPath:
+	// Fastpath routes.
+	switch {
+	case name == clientRoute:
 		fallthrough
-	case assetManifestPath:
-		// No caching.
-		headers.Set("Cache-Control", "public, max-age=0")
-		headers.Set("Content-Type", "application/javascript")
-
-	default:
-		if strings.HasPrefix(name, "/static/") {
-			// Long term caching for static resources.
-			headers.Set("Cache-Control", "public, max-age=31536000")
-			if strings.HasSuffix(name, ".svg") {
-				headers.Set("Content-Security-Policy", staticSVGCSP)
-			} else {
-				headers.Set("Content-Security-Policy", staticDefaultCSP)
-			}
-
-		} else {
-			// Handle rest with index (it is propably client side URL routing).
-			name = "/index.html"
-		}
+	case strings.HasPrefix(name, clientRoutePrefix):
+		// We know that this does not exist, so open up index directly.
+		name = indexPath
 	}
 
 	// Open file.
 	f, err := h.fs.Open(name)
+
+	// Header routes..
+	switch {
+	case name == indexPath:
+		// pass
+
+	case name == webworkerPath:
+		fallthrough
+	case name == assetManifestPath:
+		// No caching.
+		headers.Set("Cache-Control", "public, max-age=0")
+		headers.Set("Content-Type", "application/javascript")
+
+	case strings.HasPrefix(name, precacheManifestPrefix):
+		fallthrough
+	case strings.HasPrefix(name, staticPrefix):
+		// Long term caching for static resources.
+		headers.Set("Cache-Control", "public, max-age=31536000")
+		if strings.HasSuffix(name, ".svg") {
+			headers.Set("Content-Security-Policy", staticSVGCSP)
+		} else {
+			headers.Set("Content-Security-Policy", staticDefaultCSP)
+		}
+
+	default:
+		if err == nil {
+			// Other top level file, no special headers.
+		} else if os.IsNotExist(err) {
+			// Handle rest with index (it is propably client side URL routing).
+			f, err = h.fs.Open(indexPath)
+		}
+	}
+
 	if err != nil {
 		msg, code := toHTTPError(err)
 		http.Error(w, msg, code)
