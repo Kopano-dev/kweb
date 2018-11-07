@@ -101,6 +101,9 @@ rewrite /api/v1/rtm.connect {
 rewrite /api/v1/rtm.turn {
 	to /upstreams/kwmserver/{path}
 }
+rewrite /api/kwm/v2/ {
+	to /upstreams/kwmserver/{path}
+}
 
 # Known Kopano static progressive webapps
 staticpwa /meet ./meet-webapp
