@@ -7,7 +7,6 @@ package config
 
 import (
 	"bytes"
-	"fmt"
 )
 
 // Caddyfile returns a functional caddy file representing our config.
@@ -67,9 +66,6 @@ func Caddyfile(config *Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Debug`
-	fmt.Printf("--- cfg start ---\n%s\n-- cfg end --\n", buf.String())
 
 	// Return created config.
 	return buf.Bytes(), nil
