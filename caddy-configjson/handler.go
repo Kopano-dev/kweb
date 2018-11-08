@@ -16,17 +16,11 @@ import (
 	"github.com/mholt/caddy/caddyhttp/httpserver"
 )
 
-// VersionStamp is the version added to config JSON kweb.v key.
-const VersionStamp = 20181004
-
 const grapiPrefix = "/api/gc/v1"
 
 var defaultJSON = []byte(fmt.Sprintf(`{
-  "apiPrefix": "%s",
-  "kweb": {
-    "v": %d
-  }
-}`, grapiPrefix, VersionStamp))
+  "apiPrefix": "%s"
+}`, grapiPrefix))
 
 // ConfigJSONHandler is a handler to return config JSON files.
 type ConfigJSONHandler struct {
