@@ -38,6 +38,7 @@ func setup(c *caddy.Controller) error {
 		mid := func(next httpserver.Handler) httpserver.Handler {
 			return NewConfigJSONHandler(
 				url,
+				cfg.Root,
 				path,
 				next,
 			)

@@ -6,8 +6,11 @@
 package caddyconfigjson
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mholt/caddy/caddyhttp/httpserver"
@@ -27,22 +30,28 @@ var defaultJSON = []byte(fmt.Sprintf(`{
 
 // ConfigJSONHandler is a handler to return config JSON files.
 type ConfigJSONHandler struct {
-	url     string
-	handler http.Handler
-	fs      http.Dir
+	url      string
+	handler  http.Handler
+	fs       *http.Dir
+	internal string
 
 	Next httpserver.Handler
 }
 
 // NewConfigJSONHandler creates a new ConfigJSONHandler with the provided options.
-func NewConfigJSONHandler(url, path string, next httpserver.Handler) *ConfigJSONHandler {
+func NewConfigJSONHandler(url, root, path string, next httpserver.Handler) *ConfigJSONHandler {
 	h := &ConfigJSONHandler{
 		url: url,
 
 		Next: next,
 	}
 	if path != "" {
-		h.fs = http.Dir(path)
+		if !filepath.IsAbs(path) {
+			h.internal = "/" + filepath.Clean(path)
+			path = filepath.Join(root, path)
+		}
+		fs := http.Dir(path)
+		h.fs = &fs
 	}
 	h.handler = http.HandlerFunc(h.handle)
 
@@ -54,6 +63,10 @@ func (h *ConfigJSONHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (i
 
 		http.StripPrefix(h.url, h.handler).ServeHTTP(w, r)
 		return 0, nil
+	}
+
+	if h.internal != "" && strings.HasPrefix(r.RequestURI, h.internal) {
+		return http.StatusNotFound, nil
 	}
 
 	return h.Next.ServeHTTP(w, r)
@@ -73,9 +86,40 @@ func (h *ConfigJSONHandler) handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return empty JSON document.
-	w.Header().Set("Content-Type", "application/json")
+	// Avoid caching.
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+
+	if h.fs != nil {
+		// Support serving existing files from file system. Maps config
+		// requests like /:name/config.json to :name.json files found in
+		// accociated directory.
+		f, err := h.fs.Open(parts[0] + ".json")
+		if err == nil {
+			d, statErr := f.Stat()
+			if statErr == nil {
+				if !d.IsDir() {
+					http.ServeContent(w, r, "config.json", d.ModTime(), f)
+					return
+				}
+				err = errors.New("config is a directory")
+			} else {
+				err = statErr
+			}
+		}
+		if !os.IsNotExist(err) {
+			// Handle error when file exists but access or read failed.
+			if os.IsPermission(err) {
+				http.Error(w, "403 Forbidden", http.StatusForbidden)
+				return
+			}
+			// Default.
+			http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Return default JSON document.
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(defaultJSON)
 }

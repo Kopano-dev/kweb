@@ -22,7 +22,7 @@ limits {
 }
 
 # Config
-configjson /api/config/v1/kopano/
+configjson /api/config/v1/kopano/ config/kopano
 
 # Konnect
 proxy /upstreams/konnect/ {
