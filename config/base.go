@@ -75,6 +75,8 @@ rewrite /api/gc/v1/ {
 rewrite /api/pubs/v1/ {
 	to /upstream/kapi/{path}
 }
+rewrite /api/kvs/v1/
+	to /upstream/kapi/{path}
 
 # Kwmserver
 proxy /upstreams/kwmserver/ {
