@@ -17,7 +17,7 @@ pipeline {
 			steps {
 				echo 'Bootstrapping..'
 				sh 'curl -sSL -o $GOBIN/dep https://github.com/golang/dep/releases/download/$DEP_RELEASE_TAG/dep-linux-amd64 && chmod 755 $GOBIN/dep'
-				sh 'go get -v github.com/golang/lint/golint'
+				sh 'go get -v golang.org/x/lint/golint'
 				sh 'go get -v github.com/tebeka/go2xunit'
 				sh 'apt-get update && apt-get install -y build-essential'
 			}
