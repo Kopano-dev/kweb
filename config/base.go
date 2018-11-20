@@ -73,10 +73,10 @@ rewrite /api/gc/v1/ {
 	to /upstreams/kapi/{path}
 }
 rewrite /api/pubs/v1/ {
-	to /upstream/kapi/{path}
+	to /upstreams/kapi/{path}
 }
 rewrite /api/kvs/v1/ {
-	to /upstream/kapi/{path}
+	to /upstreams/kapi/{path}
 }
 
 # Kwmserver
