@@ -32,7 +32,7 @@ ENV VERSION latest
 ENV EXE=kwebd
 
 # Defaults which can be overwritten.
-ENV KOPANO_KWEB_ASSETS_PATH=/.caddy
+ENV KOPANO_KWEB_ASSETS_PATH=/.kweb
 ENV ARGS=
 
 # User and group defaults.
