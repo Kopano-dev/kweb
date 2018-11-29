@@ -28,11 +28,12 @@ EXPOSE 80 443 2015
 # Version to include in this Docker image. Default to latest.
 ENV VERSION latest
 
-# Defaults which can be overwritten.
-ENV ARGS=
-
 # Define basic environment variables.
 ENV EXE=kwebd
+
+# Defaults which can be overwritten.
+ENV KOPANO_KWEB_ASSETS_PATH=/.caddy
+ENV ARGS=
 
 # User and group defaults.
 ENV KWEBD_USER=nobody

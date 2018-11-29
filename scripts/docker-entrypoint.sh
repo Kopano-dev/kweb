@@ -33,6 +33,12 @@ fi
 # Setup environment.
 setup_env() {
 	[ -f /etc/defaults/docker-env ] && source /etc/defaults/docker-env
+
+	if [ -z "$KOPANO_KWEB_ASSETS_PATH" ]; then
+		KOPANO_KWEB_ASSETS_PATH="/.kweb"
+	fi
+	mkdir -p "$KOPANO_KWEB_ASSETS_PATH" && chown -R ${KWEBD_USER}:${KWEBD_GROUP} "$KOPANO_KWEB_ASSETS_PATH"
+	export CADDYPATH="$KOPANO_KWEB_ASSETS_PATH"
 }
 setup_env
 
