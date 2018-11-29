@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# Copyright 2018 Kopano and its licensors
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License, version 3 or
+# later, as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+FROM alpine:3.7
+MAINTAINER Kopano Development <development@kopano.io>
+
+RUN apk add --update \
+	su-exec \
+	&& rm -rf /var/cache/apk/*
+
+# Expose ports.
+EXPOSE 80 443 2015
+
+# Version to include in this Docker image. Default to latest.
+ENV VERSION latest
+
+# Defaults which can be overwritten.
+ENV ARGS=
+
+# Define basic environment variables.
+ENV EXE=kwebd
+
+# User and group defaults.
+ENV KWEBD_USER=nobody
+ENV KWEBD_GROUP=nogroup
+
+WORKDIR /srv
+
+# Copy Docker specific scripts and ensure they are executable.
+COPY \
+	scripts/docker-entrypoint.sh \
+	/usr/local/bin/
+RUN chmod 755 /usr/local/bin/*.sh
+
+# Add Docker specific runtime setup functions.
+RUN mkdir /etc/defaults && echo $'\
+setup_secrets() { \n\
+	true\n\
+}\n\
+setup_secrets\n\
+' > /etc/defaults/docker-env
+
+# Download
+RUN apk add --no-cache ca-certificates curl && \
+	pwd && \
+	mkdir -p /var/lib/kwebd-docker && \
+	curl -sSL https://download.kopano.io/community/kweb:/kopano-kweb-${VERSION}.tar.gz | \
+	tar -C /var/lib/kwebd-docker --strip 1 -vxzf - && \
+	mv /var/lib/kwebd-docker/${EXE} /usr/local/bin/${EXE}
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD [ \
+	"kwebd", \
+	"--help" \
+	]
+
