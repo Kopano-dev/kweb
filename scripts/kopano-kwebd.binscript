@@ -16,8 +16,8 @@ DEFAULT_HTTPS_PORT=443
 DEFAULT_HTTP_PORT=80
 DEFAULT_HTTPS_PORT_ALTERNATE=9443
 DEFAULT_HTTP_PORT_ALTERNATE=9080
-DEFAULT_ASSETS_PATH=/etc/kopano/kweb/.kweb
 DEFAULT_EXTRA_CONFIG=/etc/kopano/kweb/extra.d/extra.cfg
+DEFAULT_ASSETS_PATH=/etc/kopano/kweb/.kweb
 DEFAULT_STATICPWA_PATH_PATTERN=/usr/share/kopano-%name/%path
 
 setup_env() {
@@ -80,6 +80,12 @@ case "${1}" in
 			fi
 		fi
 
+		if [ -z "$extra" ]; then
+			if [ -f "$DEFAULT_EXTRA_CONFIG" ]; then
+				extra=$DEFAULT_EXTRA_CONFIG
+			fi
+		fi
+
 		if [ -n "$request_log_file" ]; then
 			set -- "$@" --request-log="$request_log_file"
 		fi
@@ -108,7 +114,7 @@ case "${1}" in
 			set -- "$@" --bind="$bind"
 		fi
 
-		if [ -n "$tls" -a "$http2" != "yes" ]; then
+		if [ -n "$http2" -a "$http2" != "yes" ]; then
 			set -- "$@" --http2=false
 		fi
 
@@ -138,6 +144,10 @@ case "${1}" in
 
 		if [ "$tls_must_staple" = "yes" ]; then
 			set -- "$@" --tls-must-staple
+		fi
+
+		if [ -n "$extra" ]; then
+			set -- "$@" --extra="$extra"
 		fi
 
 		set -- "$@" --root="$web_root" --http-port="$http_port" --https-port="$https_port"
