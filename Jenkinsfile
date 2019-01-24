@@ -20,6 +20,7 @@ pipeline {
 				sh 'go get -v golang.org/x/lint/golint'
 				sh 'go get -v github.com/tebeka/go2xunit'
 				sh 'apt-get update && apt-get install -y build-essential'
+				sh 'go version'
 			}
 		}
 		stage('Lint') {
