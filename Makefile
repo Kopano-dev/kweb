@@ -104,11 +104,11 @@ test-xml: vendor | $(BASE) ; $(info running $(NAME:%=% )tests ...)	@
 # Dep
 
 Gopkg.lock: Gopkg.toml | $(BASE) ; $(info updating dependencies ...)
-	@cd $(BASE) && $(DEP) ensure -update
+	@cd $(BASE) && $(DEP) ensure -v -update
 	@touch $@
 
 vendor: Gopkg.lock | $(BASE) ; $(info retrieving dependencies ...)
-	@cd $(BASE) && $(DEP) ensure -vendor-only
+	@cd $(BASE) && $(DEP) ensure -v -vendor-only
 	@touch $@
 
 # Dist
