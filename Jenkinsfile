@@ -23,6 +23,12 @@ pipeline {
 				sh 'go version'
 			}
 		}
+		stage('Vendor') {
+			steps {
+				echo 'Fetching vendor dependencies..'
+				sh 'make vendor'
+			}
+		}
 		stage('Lint') {
 			steps {
 				echo 'Linting..'
