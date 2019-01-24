@@ -6,7 +6,7 @@
 
 [[constraint]]
   name = "github.com/mholt/caddy"
-  branch = "master"
+  revision = "13f9c34d161693c1c0828fea3750d01c068174b6"
 
 [[override]]
   name = "github.com/xenolf/lego"
@@ -15,3 +15,7 @@
 [[override]]
   name = "github.com/russross/blackfriday"
   revision = "067529f716f4c3f5e37c8c95ddd59df1007290ae"
+
+[[override]]
+  name = "github.com/miekg/dns"
+  version = "~1.0.15"
