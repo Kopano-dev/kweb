@@ -42,10 +42,8 @@ import (
 
 // Handler is a middleware type that can handle requests as a FastCGI client.
 type Handler struct {
-	Next    httpserver.Handler
-	Rules   []Rule
-	Root    string
-	FileSys http.FileSystem
+	Next  httpserver.Handler
+	Rules []Rule
 
 	// These are sent to CGI scripts in env variables
 	SoftwareName    string
@@ -86,7 +84,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 
 		fpath := r.URL.Path
 
-		if idx, ok := httpserver.IndexFile(h.FileSys, fpath, rule.IndexFiles); ok {
+		if idx, ok := httpserver.IndexFile(rule.FileSys, fpath, rule.IndexFiles); ok {
 			fpath = idx
 			// Index file present.
 			// If request path cannot be split, return error.
@@ -102,7 +100,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		}
 
 		// These criteria work well in this order for PHP sites
-		if !h.exists(fpath) || fpath[len(fpath)-1] == '/' || strings.HasSuffix(fpath, rule.Ext) {
+		if !rule.exists(fpath) || fpath[len(fpath)-1] == '/' || strings.HasSuffix(fpath, rule.Ext) {
 
 			// Create environment for CGI script
 			env, err := h.buildEnv(r, rule, fpath)
@@ -229,13 +227,6 @@ func writeHeader(w http.ResponseWriter, r *http.Response) {
 		}
 	}
 	w.WriteHeader(r.StatusCode)
-}
-
-func (h Handler) exists(path string) bool {
-	if _, err := os.Stat(h.Root + path); err == nil {
-		return true
-	}
-	return false
 }
 
 // buildEnv returns a set of CGI environment variables for the request.
@@ -380,7 +371,8 @@ type Rule struct {
 
 	// Use this directory as the fastcgi root directory. Defaults to the root
 	// directory of the parent virtual host.
-	Root string
+	Root    string
+	FileSys http.FileSystem
 
 	// The path in the URL will be split into two, with the first piece ending
 	// with the value of SplitPath. The first piece will be assumed as the
@@ -461,6 +453,13 @@ func (s *srv) Address() (string, error) {
 // canSplit checks if path can split into two based on rule.SplitPath.
 func (r Rule) canSplit(path string) bool {
 	return r.splitPos(path) >= 0
+}
+
+func (r Rule) exists(path string) bool {
+	if _, err := os.Stat(r.Root + path); err == nil {
+		return true
+	}
+	return false
 }
 
 // splitPos returns the index where path should be split
