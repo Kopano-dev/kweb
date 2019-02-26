@@ -21,6 +21,7 @@ import (
 	// Our plugins.
 	_ "stash.kopano.io/kgol/kweb/caddy-alias"
 	_ "stash.kopano.io/kgol/kweb/caddy-configjson"
+	_ "stash.kopano.io/kgol/kweb/caddy-fastcgi"
 	_ "stash.kopano.io/kgol/kweb/caddy-folderish"
 	_ "stash.kopano.io/kgol/kweb/caddy-staticpwa"
 )
