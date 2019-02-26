@@ -82,28 +82,37 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, error) 
 		// we probably want to exclude static assets (CSS, JS, images...)
 		// but we also want to be flexible for the script we proxy to.
 
-		fpath := r.URL.Path
+		upath := r.URL.Path
+		fpath := upath
+		if rule.WithoutPathPrefix != "" {
+			fpath = path.Join("/", strings.TrimPrefix(fpath, rule.WithoutPathPrefix))
+			if fpath == "" {
+				fpath = "/"
+			}
+		}
 
 		if idx, ok := httpserver.IndexFile(rule.FileSys, fpath, rule.IndexFiles); ok {
+			if fpath != upath {
+				upath = path.Join(rule.WithoutPathPrefix, idx)
+			}
 			fpath = idx
 			// Index file present.
 			// If request path cannot be split, return error.
-			if !rule.canSplit(fpath) {
+			if !rule.canSplit(upath) {
 				return http.StatusInternalServerError, ErrIndexMissingSplit
 			}
 		} else {
 			// No index file present.
 			// If request path cannot be split, ignore request.
-			if !rule.canSplit(fpath) {
+			if !rule.canSplit(upath) {
 				continue
 			}
 		}
 
 		// These criteria work well in this order for PHP sites
 		if !rule.exists(fpath) || fpath[len(fpath)-1] == '/' || strings.HasSuffix(fpath, rule.Ext) {
-
 			// Create environment for CGI script
-			env, err := h.buildEnv(r, rule, fpath)
+			env, err := h.buildEnv(r, rule, upath, fpath)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
@@ -230,7 +239,7 @@ func writeHeader(w http.ResponseWriter, r *http.Response) {
 }
 
 // buildEnv returns a set of CGI environment variables for the request.
-func (h Handler) buildEnv(r *http.Request, rule Rule, fpath string) (map[string]string, error) {
+func (h Handler) buildEnv(r *http.Request, rule Rule, upath string, fpath string) (map[string]string, error) {
 	var env map[string]string
 
 	// Separate remote IP and port; more lenient than net.SplitHostPort
@@ -248,23 +257,18 @@ func (h Handler) buildEnv(r *http.Request, rule Rule, fpath string) (map[string]
 
 	// Split path in preparation for env variables.
 	// Previous rule.canSplit checks ensure this can never be -1.
-	splitPos := rule.splitPos(fpath)
+	splitPos := rule.splitPos(upath)
 
 	// Request has the extension; path was split successfully
-	docURI := fpath[:splitPos+len(rule.SplitPath)]
-	pathInfo := fpath[splitPos+len(rule.SplitPath):]
-	scriptName := fpath
+	docURI := upath[:splitPos+len(rule.SplitPath)]
+	pathInfo := upath[splitPos+len(rule.SplitPath):]
+	scriptName := upath
 
-	// Strip PATH_INFO from SCRIPT_NAME
+	// Get SCRIPT_NAME from URL path and strip PATH_INFO
 	scriptName = strings.TrimSuffix(scriptName, pathInfo)
 
-	// SCRIPT_FILENAME is the absolute path of SCRIPT_NAME
-	var scriptFilename string
-	if rule.WithoutPathPrefix != "" {
-		scriptFilename = filepath.Join(rule.Root, strings.TrimPrefix(scriptName, rule.WithoutPathPrefix))
-	} else {
-		scriptFilename = filepath.Join(rule.Root, scriptName)
-	}
+	// Use absolute file path as SCRIPT_FILENAME and strip PATH_INFO
+	scriptFilename := filepath.Join(rule.Root, strings.TrimSuffix(fpath, pathInfo))
 
 	// Add vhost path prefix to scriptName. Otherwise, some PHP software will
 	// have difficulty discovering its URL.
