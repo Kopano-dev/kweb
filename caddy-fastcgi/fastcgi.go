@@ -268,7 +268,12 @@ func (h Handler) buildEnv(r *http.Request, rule Rule, fpath string) (map[string]
 	scriptName = strings.TrimSuffix(scriptName, pathInfo)
 
 	// SCRIPT_FILENAME is the absolute path of SCRIPT_NAME
-	scriptFilename := filepath.Join(rule.Root, scriptName)
+	var scriptFilename string
+	if rule.WithoutPathPrefix != "" {
+		scriptFilename = filepath.Join(rule.Root, strings.TrimPrefix(scriptName, rule.WithoutPathPrefix))
+	} else {
+		scriptFilename = filepath.Join(rule.Root, scriptName)
+	}
 
 	// Add vhost path prefix to scriptName. Otherwise, some PHP software will
 	// have difficulty discovering its URL.
@@ -392,6 +397,10 @@ type Rule struct {
 
 	// Ignored paths
 	IgnoredSubPaths []string
+
+	// If the URL starts with a prefix, this prefix is removed from the path,
+	// before generatin fastcgi env.
+	WithoutPathPrefix string
 
 	// The duration used to set a deadline when connecting to an upstream.
 	ConnectTimeout time.Duration

@@ -30,10 +30,12 @@ import (
 var defaultTimeout = 60 * time.Second
 
 func init() {
-	caddy.RegisterPlugin("fastcgi", caddy.Plugin{
+	caddy.RegisterPlugin("fastcgi2", caddy.Plugin{
 		ServerType: "http",
 		Action:     setup,
 	})
+
+	httpserver.RegisterDevDirective("fastcgi2", "fastcgi")
 }
 
 // setup configures a new FastCGI middleware instance.
@@ -149,6 +151,12 @@ func fastcgiParse(c *caddy.Controller) ([]Rule, error) {
 					return rules, c.ArgErr()
 				}
 				rule.IgnoredSubPaths = ignoredPaths
+			case "without":
+				args := c.RemainingArgs()
+				if len(args) != 1 {
+					return rules, c.ArgErr()
+				}
+				rule.WithoutPathPrefix = args[0]
 
 			case "connect_timeout":
 				if !c.NextArg() {
