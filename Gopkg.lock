@@ -466,6 +466,8 @@
     "github.com/mholt/caddy",
     "github.com/mholt/caddy/caddy/caddymain",
     "github.com/mholt/caddy/caddyhttp/httpserver",
+    "github.com/mholt/caddy/caddyhttp/staticfiles",
+    "github.com/mholt/caddy/caddytls",
     "github.com/pyed/ipfilter",
     "github.com/spf13/cobra",
     "github.com/xuqingfeng/caddy-rate-limit",
