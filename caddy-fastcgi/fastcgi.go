@@ -1,3 +1,4 @@
+// Copyright 2019 Kopano b.v.
 // Copyright 2015 Light Code Labs, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
+// This fastcgi module is a copy of fastcgi from upstream Caddy fastcgi,
+// modified by Kopano b.v. to imrove index document handling and adding a new
+// without sub directive.
 
 // Package fastcgi has middleware that acts as a FastCGI client. Requests
 // that get forwarded to FastCGI stop the middleware execution chain.
