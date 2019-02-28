@@ -146,6 +146,14 @@ case "${1}" in
 			set -- "$@" --tls-must-staple
 		fi
 
+		if [ -n "$default_redirect" ]; then
+			set -- "$@" --default-redirect="$default_redirect"
+		fi
+
+		if [ -n "$legacy_reverse_proxy" ]; then
+			set -- "$@" --reverse-proxy-legacy-http="$legacy_reverse_proxy"
+		fi
+
 		if [ -n "$extra" ]; then
 			set -- "$@" --extra="$extra"
 		fi
