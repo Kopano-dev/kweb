@@ -34,8 +34,6 @@ proxy /upstreams/konnect/ {
 	try_duration 30s
 	keepalive 100
 	transparent
-	header_downstream Feature-Policy "midi 'none'"
-	header_downstream X-Frame-Options "sameorigin"
 }
 ratelimit * 100 200 minute {
 	/upstreams/konnect/v1/
