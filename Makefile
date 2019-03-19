@@ -40,7 +40,7 @@ $(BASE): ; $(info creating local GOPATH ...)
 
 .PHONY: $(CMDS)
 $(CMDS): vendor | $(BASE) ; $(info building $@ ...) @
-	cd $(BASE) && $(GO) build \
+	cd $(BASE) && CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
 		-tags release \
 		-asmflags '-trimpath=$(GOPATH)' \
 		-gcflags '-trimpath=$(GOPATH)' \
