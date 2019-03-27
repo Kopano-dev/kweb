@@ -10,6 +10,8 @@ GOLINT  ?= golint
 
 GO2XUNIT ?= go2xunit
 
+CHGLOG ?= git-chglog
+
 # Cgo
 CGO_ENABLED ?= 0
 
@@ -136,6 +138,10 @@ dist: 3rdparty-LICENSES.md ; $(info building dist tarball ...)
 	cp -avf ../scripts/favicon.ico "${PACKAGE_NAME}-${VERSION}/scripts" && \
 	tar --owner=0 --group=0 -czvf ${PACKAGE_NAME}-${VERSION}.tar.gz "${PACKAGE_NAME}-${VERSION}" && \
 	cd ..
+
+.PHONE: changelog
+changelog: ; $(info updating changelog ...)
+	$(CHGLOG) --output CHANGELOG.md
 
 # Rest
 
