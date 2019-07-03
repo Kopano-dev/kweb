@@ -15,12 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-FROM alpine:3.7
+FROM alpine:3.10
 MAINTAINER Kopano Development <development@kopano.io>
 
-RUN apk add --update \
-	su-exec \
-	&& rm -rf /var/cache/apk/*
+RUN apk add --update --no-cache \
+	su-exec
 
 # Expose ports.
 EXPOSE 80 443 2015
@@ -33,7 +32,7 @@ ENV EXE=kwebd
 
 # Defaults which can be overwritten.
 ENV KOPANO_KWEB_ASSETS_PATH=/.kweb
-ENV ARGS=
+ENV ARGS=""
 
 # User and group defaults.
 ENV KWEBD_USER=nobody
