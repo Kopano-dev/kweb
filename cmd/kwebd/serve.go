@@ -12,8 +12,8 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/mholt/caddy"
-	"github.com/mholt/caddy/caddy/caddymain"
+	"github.com/caddyserver/caddy"
+	"github.com/caddyserver/caddy/caddy/caddymain"
 	"github.com/spf13/cobra"
 
 	"stash.kopano.io/kgol/kweb/config"

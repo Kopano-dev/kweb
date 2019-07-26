@@ -19,8 +19,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mholt/caddy/caddyhttp/httpserver"
-	"github.com/mholt/caddy/caddyhttp/staticfiles"
+	"github.com/caddyserver/caddy/caddyhttp/httpserver"
+	"github.com/caddyserver/caddy/caddyhttp/staticfiles"
 )
 
 // AliasHandler is a handler to which changes the root folder.

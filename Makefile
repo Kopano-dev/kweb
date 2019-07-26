@@ -46,7 +46,7 @@ $(CMDS): vendor | $(BASE) ; $(info building $@ ...) @
 		-tags release \
 		-asmflags '-trimpath=$(GOPATH)' \
 		-gcflags '-trimpath=$(GOPATH)' \
-		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -X $(PACKAGE)/vendor/github.com/mholt/caddy/caddy/caddymain.gitTag=kweb-$(VERSION) -X $(PACKAGE)/vendor/github.com/mholt/caddy/caddy/caddymain.buildDate=$(DATE) -extldflags -static' \
+		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -extldflags -static' \
 		-o bin/$(notdir $@) $(PACKAGE)/$@
 
 # Helpers

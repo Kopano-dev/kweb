@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mholt/caddy/caddy/caddymain"
+	"github.com/caddyserver/caddy/caddy/caddymain"
 	"github.com/spf13/cobra"
 
 	// 3rd party plugins.
