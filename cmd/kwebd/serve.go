@@ -47,7 +47,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().Bool("tls", true, "Enable TLS on listener")
 	serveCmd.Flags().Bool("tls-always-self-sign", false, "Always generate self signed certificate")
 	serveCmd.Flags().Bool("tls-must-staple", false, "Enable TLS must staple")
-	serveCmd.Flags().String("tls-protocols", "tls1.2 tls1.2", "Min and max TLS protocol")
+	serveCmd.Flags().String("tls-protocols", "tls1.2 tls1.3", "Min and max TLS protocol")
 	serveCmd.Flags().String("tls-cert-file", "", "Path to TLS certificate bundle (concatenation of the server's certificate followed by the CA's certificate chain)")
 	serveCmd.Flags().String("tls-key-file", "", "Path to the server's private key file which matches the certificate bundle")
 	serveCmd.Flags().String("hsts", "max-age=31536000;", "HTTP Strict Transport Security (default enabled when --host is given unless explicitly set to empty)")
