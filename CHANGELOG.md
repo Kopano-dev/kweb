@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Update README
+- Enable TLSv1.3 by default
+- Update to Caddy 1.0 and dependencies
+- Add import binder
+- Install mailcap package
+- Update Dockerfile
 - Generate changelog with https://github.com/git-chglog/git-chglog
 - Correctly use CGO_ENABLED variable bin cmd build target
 
