@@ -14,6 +14,7 @@ import (
 
 	"github.com/caddyserver/caddy"
 	"github.com/caddyserver/caddy/caddy/caddymain"
+	"github.com/mholt/certmagic"
 	"github.com/spf13/cobra"
 
 	"stash.kopano.io/kgol/kweb/config"
@@ -32,13 +33,15 @@ func commandServe() *cobra.Command {
 	}
 
 	serveCmd.Flags().Bool("agree", false, "Agree to the CA's Subscriber Agreement")
-	serveCmd.Flags().String("ca", "https://acme-v02.api.letsencrypt.org/directory", "URL to certificate authority's ACME server directory")
+	serveCmd.Flags().String("ca", certmagic.Default.CA, "URL to certificate authority's ACME server directory")
+	serveCmd.Flags().String("catimeout", certmagic.HTTPTimeout.String(), "Default ACME CA HTTP timeout")
 	serveCmd.Flags().String("email", "", "ACME CA account email address")
 	serveCmd.Flags().Bool("http2", true, "Use HTTP/2")
 	serveCmd.Flags().Bool("quic", false, "Use experimental QUIC")
 	serveCmd.Flags().String("root", ".", "Path to web root")
 	serveCmd.Flags().Bool("validate", false, "Parse and validate the configuration but do not start the server")
 	serveCmd.Flags().String("revoke", "", "Hostname for which to revoke the certificate")
+	serveCmd.Flags().String("default-sni", certmagic.Default.DefaultServerName, "If a ClientHello ServerName is empty, use this ServerName to choose a TLS certificate")
 	serveCmd.Flags().String("request-log", "", "Log destination for request logging")
 	serveCmd.Flags().String("host", "0.0.0.0", "Hostname to serve")
 	serveCmd.Flags().String("http-port", "80", "Port to use for HTTP")
@@ -67,6 +70,9 @@ func serve(cmd *cobra.Command, args []string) error {
 	if ca, _ := cmd.Flags().GetString("ca"); ca != "" {
 		caddyArgs = append(caddyArgs, "-ca", ca)
 	}
+	if catimeout, _ := cmd.Flags().GetString("catimeout"); catimeout != "" {
+		caddyArgs = append(caddyArgs, "-catimeout", catimeout)
+	}
 	if http2, _ := cmd.Flags().GetBool("http2"); http2 {
 		caddyArgs = append(caddyArgs, "-http2")
 	}
@@ -78,6 +84,9 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 	if revoke, _ := cmd.Flags().GetString("revoke"); revoke != "" {
 		caddyArgs = append(caddyArgs, "-revoke", revoke)
+	}
+	if defaultSNI, _ := cmd.Flags().GetString("default-sni"); defaultSNI != "" {
+		caddyArgs = append(caddyArgs, "-default-sni", defaultSNI)
 	}
 
 	root, _ := cmd.Flags().GetString("root")
