@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+
+## v0.7.0 (2019-07-30)
+
+- Add additional commandline parameters for serve
 - Update README
 - Enable TLSv1.3 by default
 - Update to Caddy 1.0 and dependencies
