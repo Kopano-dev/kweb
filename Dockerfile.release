@@ -19,6 +19,7 @@ FROM alpine:3.10
 MAINTAINER Kopano Development <development@kopano.io>
 
 RUN apk add --update --no-cache \
+	libcap \
 	mailcap \
 	su-exec
 
@@ -49,7 +50,7 @@ COPY \
 RUN chmod 755 /usr/local/bin/*.sh
 
 # Add Docker specific runtime setup functions.
-RUN mkdir /etc/defaults && echo $'\
+RUN mkdir /etc/defaults && echo -e $'\
 setup_secrets() { \n\
 	true\n\
 }\n\
@@ -62,7 +63,8 @@ RUN apk add --no-cache ca-certificates curl && \
 	mkdir -p /var/lib/kwebd-docker && \
 	curl -sSL https://download.kopano.io/community/kweb:/kopano-kweb-${VERSION}.tar.gz | \
 	tar -C /var/lib/kwebd-docker --strip 1 -vxzf - && \
-	mv /var/lib/kwebd-docker/${EXE} /usr/local/bin/${EXE}
+	mv /var/lib/kwebd-docker/${EXE} /usr/local/bin/${EXE} && \
+	setcap 'cap_net_bind_service=+ep' /usr/local/bin/${EXE}
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD [ \
