@@ -39,8 +39,8 @@ pipeline {
 		stage('Build') {
 			steps {
 				echo 'Building..'
-				sh 'make'
-				sh './bin/kwebd version'
+				sh 'make DATE=reproducible'
+				sh './bin/kwebd version && sha256sum ./bin/kwebd'
 			}
 		}
 		stage('Test') {
