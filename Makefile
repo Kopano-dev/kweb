@@ -5,7 +5,6 @@ PACKAGE_NAME = kopano-$(shell basename $(PACKAGE))
 
 GO      ?= go
 GOFMT   ?= gofmt
-DEP     ?= dep
 GOLINT  ?= golint
 
 GO2XUNIT ?= go2xunit
@@ -14,6 +13,7 @@ CHGLOG ?= git-chglog
 
 # Cgo
 CGO_ENABLED ?= 0
+GO111MODULE ?= on
 
 # Variables
 ARGS    ?=
@@ -26,7 +26,7 @@ TESTPKGS = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .Impo
 CMDS     = $(or $(CMD),$(addprefix cmd/,$(notdir $(shell find "$(PWD)/cmd/" -type d))))
 TIMEOUT  = 30
 
-export CGO_ENABLED
+export CGO_ENABLED GO111MODULE
 
 # Build
 
@@ -65,7 +65,7 @@ fmt: ; $(info running gofmt ...)	@
 
 .PHONY: check
 check: ; $(info checking dependencies ...) @
-	@$(DEP) check && echo OK
+	@$(GO) mod verify && echo OK
 
 # Tests
 
@@ -99,12 +99,12 @@ test-xml: vendor ; $(info running $(NAME:%=% )tests ...)	@
 
 # Dep
 
-Gopkg.lock: Gopkg.toml ; $(info updating dependencies ...)
-	@$(DEP) ensure -v -update
+go.sum: go.mod ; $(info updating dependencies ...)
+	@$(GO) mod tidy -v
 	@touch $@
 
-vendor: Gopkg.lock ; $(info retrieving dependencies ...)
-	@$(DEP) ensure -v -vendor-only
+vendor: go.sum ; $(info retrieving dependencies ...)
+	@$(GO) mod vendor -v
 	@touch $@
 
 # Dist
