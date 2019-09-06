@@ -21,14 +21,12 @@ PWD     := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 DATE    ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2>/dev/null | sed 's/^v//' || \
 			cat $(CURDIR)/.version 2> /dev/null || echo 0.0.0-unreleased)
-GOPATH   = $(CURDIR)/.gopath
-BASE     = $(GOPATH)/src/$(PACKAGE)
-PKGS     = $(or $(PKG),$(shell cd $(BASE) && env GOPATH=$(GOPATH) $(GO) list ./... | grep -v "^$(PACKAGE)/vendor/"))
-TESTPKGS = $(shell env GOPATH=$(GOPATH) $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS) 2>/dev/null)
+PKGS     = $(or $(PKG),$(shell $(GO) list ./... | grep -v "^$(PACKAGE)/vendor/"))
+TESTPKGS = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS) 2>/dev/null)
 CMDS     = $(or $(CMD),$(addprefix cmd/,$(notdir $(shell find "$(PWD)/cmd/" -type d))))
 TIMEOUT  = 30
 
-export GOPATH CGO_ENABLED
+export CGO_ENABLED
 
 # Build
 
@@ -37,30 +35,25 @@ all: fmt vendor | $(CMDS) $(PLUGINS)
 
 plugins: fmt vendor | $(PLUGINS)
 
-$(BASE): ; $(info creating local GOPATH ...)
-	@mkdir -p $(dir $@)
-	@ln -sf $(CURDIR) $@
-
 .PHONY: $(CMDS)
-$(CMDS): vendor | $(BASE) ; $(info building $@ ...) @
-	cd $(BASE) && CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
+$(CMDS): vendor ; $(info building $@ ...) @
+	CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
+		-trimpath \
 		-tags release \
-		-asmflags '-trimpath=$(GOPATH)' \
-		-gcflags '-trimpath=$(GOPATH)' \
 		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -extldflags -static' \
 		-o bin/$(notdir $@) $(PACKAGE)/$@
 
 # Helpers
 
 .PHONY: lint
-lint: vendor | $(BASE) ; $(info running golint ...)	@
-	@cd $(BASE) && ret=0 && for pkg in $(PKGS); do \
+lint: vendor ; $(info running golint ...)	@
+	@ret=0 && for pkg in $(PKGS); do \
 		test -z "$$($(GOLINT) $$pkg | tee /dev/stderr)" || ret=1 ; \
 	done ; exit $$ret
 
 .PHONY: vet
-vet: vendor | $(BASE) ; $(info running go vet ...)	@
-	@cd $(BASE) && ret=0 && for pkg in $(PKGS); do \
+vet: vendor ; $(info running go vet ...)	@
+	@ret=0 && for pkg in $(PKGS); do \
 		test -z "$$($(GO) vet $$pkg)" || ret=1 ; \
 	done ; exit $$ret
 
@@ -72,7 +65,7 @@ fmt: ; $(info running gofmt ...)	@
 
 .PHONY: check
 check: ; $(info checking dependencies ...) @
-	@cd $(BASE) && $(DEP) check && echo OK
+	@$(DEP) check && echo OK
 
 # Tests
 
@@ -87,8 +80,8 @@ $(TEST_TARGETS): NAME=$(MAKECMDGOALS:test-%=%)
 $(TEST_TARGETS): test
 
 .PHONY: test
-test: vendor | $(BASE) ; $(info running $(NAME:%=% )tests ...)	@
-	@cd $(BASE) && CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) $(TESTPKGS)
+test: vendor ; $(info running $(NAME:%=% )tests ...)	@
+	@CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) $(TESTPKGS)
 
 TEST_XML_TARGETS := test-xml-default test-xml-short test-xml-race
 .PHONY: $(TEST_XML_TARGETS)
@@ -99,26 +92,26 @@ $(TEST_XML_TARGETS): NAME=$(MAKECMDGOALS:test-%=%)
 $(TEST_XML_TARGETS): test-xml
 
 .PHONY: test-xml
-test-xml: vendor | $(BASE) ; $(info running $(NAME:%=% )tests ...)	@
+test-xml: vendor ; $(info running $(NAME:%=% )tests ...)	@
 	@mkdir -p test
-	cd $(BASE) && 2>&1 CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) -v $(TESTPKGS) | tee test/tests.output
+	2>&1 CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) -v $(TESTPKGS) | tee test/tests.output
 	$(shell test -s test/tests.output && $(GO2XUNIT) -fail -input test/tests.output -output test/tests.xml)
 
 # Dep
 
-Gopkg.lock: Gopkg.toml | $(BASE) ; $(info updating dependencies ...)
-	@cd $(BASE) && $(DEP) ensure -v -update
+Gopkg.lock: Gopkg.toml ; $(info updating dependencies ...)
+	@$(DEP) ensure -v -update
 	@touch $@
 
-vendor: Gopkg.lock | $(BASE) ; $(info retrieving dependencies ...)
-	@cd $(BASE) && $(DEP) ensure -v -vendor-only
+vendor: Gopkg.lock ; $(info retrieving dependencies ...)
+	@$(DEP) ensure -v -vendor-only
 	@touch $@
 
 # Dist
 
 .PHONY: licenses
 licenses: ; $(info building licenses files ...)
-	cd $(BASE) && $(CURDIR)/scripts/go-license-ranger.py > $(CURDIR)/3rdparty-LICENSES.md
+	$(CURDIR)/scripts/go-license-ranger.py > $(CURDIR)/3rdparty-LICENSES.md
 
 3rdparty-LICENSES.md: licenses
 
@@ -148,7 +141,6 @@ changelog: ; $(info updating changelog ...)
 
 .PHONY: clean
 clean: ; $(info cleaning ...)	@
-	@rm -rf $(GOPATH)
 	@rm -rf bin
 	@rm -rf test/test.*
 
