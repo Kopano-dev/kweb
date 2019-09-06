@@ -27,6 +27,7 @@ CMDS     = $(or $(CMD),$(addprefix cmd/,$(notdir $(shell find "$(PWD)/cmd/" -typ
 TIMEOUT  = 30
 
 export CGO_ENABLED GO111MODULE
+unexport GOPATH
 
 # Build
 
@@ -38,10 +39,13 @@ plugins: fmt vendor | $(PLUGINS)
 .PHONY: $(CMDS)
 $(CMDS): vendor ; $(info building $@ ...) @
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
+		-mod=readonly \
 		-trimpath \
 		-tags release \
+		-buildmode=exe \
 		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -extldflags -static' \
-		-o bin/$(notdir $@) $(PACKAGE)/$@
+		-o bin/$(notdir $@) ./$@ && \
+	GO=$(GO) $(CURDIR)/scripts/fix-reproducible.py bin/$(notdir $@)
 
 # Helpers
 
