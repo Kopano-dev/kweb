@@ -43,9 +43,8 @@ $(CMDS): vendor ; $(info building $@ ...) @
 		-trimpath \
 		-tags release \
 		-buildmode=exe \
-		-ldflags '-s -w -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -extldflags -static' \
-		-o bin/$(notdir $@) ./$@ && \
-	GO=$(GO) $(CURDIR)/scripts/fix-reproducible.py bin/$(notdir $@)
+		-ldflags '-s -w -buildid=reproducible/$(VERSION) -X $(PACKAGE)/version.Version=$(VERSION) -X $(PACKAGE)/version.BuildDate=$(DATE) -extldflags -static' \
+		-o bin/$(notdir $@) ./$@
 
 # Helpers
 
