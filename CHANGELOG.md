@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Tell linker the buildid instead of patching binary
+- Clear actionid part from buildid for truly reproducible builds
+- Update license ranger to support Go modules
+- Move from Dep to Go modules
+- Build reproducible with Jenkins
+- Use new trimpath feature to make builds reproducible
+- Bump to Go 1.13
+- Cleanup Dockerfile
+- Add support for priviledged ports without root
 
 
 ## v0.7.0 (2019-07-30)
