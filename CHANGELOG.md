@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+
+
+## v0.8.0 (2019-09-10)
+
 - Tell linker the buildid instead of patching binary
 - Clear actionid part from buildid for truly reproducible builds
 - Update license ranger to support Go modules
