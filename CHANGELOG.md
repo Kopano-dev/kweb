@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Improve mod support in Makefile and linter
+- Udpate Dockerfiles syntax
+- Use Dockerfile.build in Jenkins
+- Move to golangci-lint for Go linting
+- Use vendor folder for build
 
 
 ## v0.8.0 (2019-09-10)
