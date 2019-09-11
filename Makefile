@@ -5,7 +5,7 @@ PACKAGE_NAME = kopano-$(shell basename $(PACKAGE))
 
 GO      ?= go
 GOFMT   ?= gofmt
-GOLINT  ?= golint
+GOLINT  ?= golangci-lint
 
 GO2XUNIT ?= go2xunit
 
@@ -54,16 +54,13 @@ $(CMDS): vendor ; $(info building $@ ...) @
 # Helpers
 
 .PHONY: lint
-lint: ; $(info running golint ...)	@
-	@ret=0 && for pkg in $(PKGS); do \
-		test -z "$$($(GOLINT) $$pkg | tee /dev/stderr)" || ret=1 ; \
-	done ; exit $$ret
+lint: ; $(info running $(GOLINT) ...)	@
+	$(GOLINT) run
 
-.PHONY: vet
-vet: ; $(info running go vet ...)	@
-	@ret=0 && for pkg in $(PKGS); do \
-		test -z "$$($(GO) vet $$pkg)" || ret=1 ; \
-	done ; exit $$ret
+.PHONY: lint-checkstyle
+lint-checkstyle: vendor ; $(info running $(GOLINT) checkstyle ...)     @
+	@mkdir -p test
+	$(GOLINT) run --out-format checkstyle --issues-exit-code 0 > test/tests.lint.xml
 
 .PHONY: fmt
 fmt: ; $(info running gofmt ...)	@
@@ -111,6 +108,7 @@ go.sum: go.mod ; $(info updating dependencies ...)
 	@$(GO) mod tidy -v
 	@touch $@
 
+.PHONY: vendor
 vendor: go.sum ; $(info retrieving dependencies ...)
 	@$(GO) mod vendor -v
 	@touch $@

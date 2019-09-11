@@ -10,12 +10,13 @@ pipeline {
 	environment {
 		GOBIN = '/usr/local/bin'
 		DEBIAN_FRONTEND = 'noninteractive'
+		GOLANGCI_LINT_TAG = 'v1.18.0'
 	}
 	stages {
 		stage('Bootstrap') {
 			steps {
 				echo 'Bootstrapping..'
-				sh 'cd / && go get -v golang.org/x/lint/golint'
+				sh 'curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(GOBIN)/bin $(GOLANGCI_LINT_TAG)'
 				sh 'cd / && go get -v github.com/tebeka/go2xunit'
 				sh 'apt-get update && apt-get install -y build-essential'
 				sh 'go version'
@@ -24,16 +25,15 @@ pipeline {
 		stage('Lint') {
 			steps {
 				echo 'Linting..'
-				sh 'make lint 2>&1 | tee golint.txt || true'
-				sh 'make vet 2>&1 | tee govet.txt || true'
-				warnings parserConfigurations: [[parserName: 'Go Lint', pattern: 'golint.txt'], [parserName: 'Go Vet', pattern: 'govet.txt']], unstableTotalAll: '0'
+				sh 'make lint-checkstyle'
+				checkstyle pattern: 'test/tests.lint.xml', canComputeNew: false, unstableTotalHigh: '100'
 			}
 		}
 		stage('Test') {
 			steps {
 				echo 'Testing..'
 				sh 'make test-xml-short'
-				junit allowEmptyResults: true, testResults: 'test/*.xml'
+				junit allowEmptyResults: true, testResults: 'test/tests.xml'
 			}
 		}
 		stage('Vendor') {
