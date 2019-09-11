@@ -12,10 +12,18 @@ GO2XUNIT ?= go2xunit
 CHGLOG ?= git-chglog
 
 # Cgo
+
 CGO_ENABLED ?= 0
+
+# Go modules
+
 GO111MODULE ?= on
 
 # Variables
+
+export CGO_ENABLED GO111MODULE
+unexport GOPATH
+
 ARGS    ?=
 PWD     := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 DATE    ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -26,20 +34,17 @@ TESTPKGS = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .Impo
 CMDS     = $(or $(CMD),$(addprefix cmd/,$(notdir $(shell find "$(PWD)/cmd/" -type d))))
 TIMEOUT  = 30
 
-export CGO_ENABLED GO111MODULE
-unexport GOPATH
-
 # Build
 
 .PHONY: all
-all: fmt vendor | $(CMDS) $(PLUGINS)
+all: fmt | $(CMDS) $(PLUGINS)
 
-plugins: fmt vendor | $(PLUGINS)
+plugins: fmt | $(PLUGINS)
 
 .PHONY: $(CMDS)
 $(CMDS): vendor ; $(info building $@ ...) @
 	CGO_ENABLED=$(CGO_ENABLED) $(GO) build \
-		-mod=readonly \
+		-mod=vendor \
 		-trimpath \
 		-tags release \
 		-buildmode=exe \
@@ -49,13 +54,13 @@ $(CMDS): vendor ; $(info building $@ ...) @
 # Helpers
 
 .PHONY: lint
-lint: vendor ; $(info running golint ...)	@
+lint: ; $(info running golint ...)	@
 	@ret=0 && for pkg in $(PKGS); do \
 		test -z "$$($(GOLINT) $$pkg | tee /dev/stderr)" || ret=1 ; \
 	done ; exit $$ret
 
 .PHONY: vet
-vet: vendor ; $(info running go vet ...)	@
+vet: ; $(info running go vet ...)	@
 	@ret=0 && for pkg in $(PKGS); do \
 		test -z "$$($(GO) vet $$pkg)" || ret=1 ; \
 	done ; exit $$ret
@@ -83,7 +88,7 @@ $(TEST_TARGETS): NAME=$(MAKECMDGOALS:test-%=%)
 $(TEST_TARGETS): test
 
 .PHONY: test
-test: vendor ; $(info running $(NAME:%=% )tests ...)	@
+test: ; $(info running $(NAME:%=% )tests ...)	@
 	@CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) $(TESTPKGS)
 
 TEST_XML_TARGETS := test-xml-default test-xml-short test-xml-race
@@ -95,12 +100,12 @@ $(TEST_XML_TARGETS): NAME=$(MAKECMDGOALS:test-%=%)
 $(TEST_XML_TARGETS): test-xml
 
 .PHONY: test-xml
-test-xml: vendor ; $(info running $(NAME:%=% )tests ...)	@
+test-xml: ; $(info running $(NAME:%=% )tests ...)	@
 	@mkdir -p test
 	2>&1 CGO_ENABLED=$(CGO_ENABLED) $(GO) test -timeout $(TIMEOUT)s $(ARGS) -v $(TESTPKGS) | tee test/tests.output
 	$(shell test -s test/tests.output && $(GO2XUNIT) -fail -input test/tests.output -output test/tests.xml)
 
-# Dep
+# Mod
 
 go.sum: go.mod ; $(info updating dependencies ...)
 	@$(GO) mod tidy -v

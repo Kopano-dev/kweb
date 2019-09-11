@@ -21,17 +21,25 @@ pipeline {
 				sh 'go version'
 			}
 		}
+		stage('Lint') {
+			steps {
+				echo 'Linting..'
+				sh 'make lint 2>&1 | tee golint.txt || true'
+				sh 'make vet 2>&1 | tee govet.txt || true'
+				warnings parserConfigurations: [[parserName: 'Go Lint', pattern: 'golint.txt'], [parserName: 'Go Vet', pattern: 'govet.txt']], unstableTotalAll: '0'
+			}
+		}
+		stage('Test') {
+			steps {
+				echo 'Testing..'
+				sh 'make test-xml-short'
+				junit allowEmptyResults: true, testResults: 'test/*.xml'
+			}
+		}
 		stage('Vendor') {
 			steps {
 				echo 'Fetching vendor dependencies..'
 				sh 'make vendor'
-			}
-		}
-		stage('Lint') {
-			steps {
-				echo 'Linting..'
-				sh 'make lint | tee golint.txt || true'
-				sh 'make vet | tee govet.txt || true'
 			}
 		}
 		stage('Build') {
@@ -39,12 +47,6 @@ pipeline {
 				echo 'Building..'
 				sh 'make DATE=reproducible'
 				sh './bin/kwebd version && sha256sum ./bin/kwebd'
-			}
-		}
-		stage('Test') {
-			steps {
-				echo 'Testing..'
-				sh 'make test-xml-short'
 			}
 		}
 		stage('Dist') {
@@ -59,8 +61,6 @@ pipeline {
 	post {
 		always {
 			archiveArtifacts 'dist/*.tar.gz'
-			junit allowEmptyResults: true, testResults: 'test/*.xml'
-			warnings parserConfigurations: [[parserName: 'Go Lint', pattern: 'golint.txt'], [parserName: 'Go Vet', pattern: 'govet.txt']], unstableTotalAll: '0'
 			cleanWs()
 		}
 	}
