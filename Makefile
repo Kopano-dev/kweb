@@ -29,8 +29,8 @@ PWD     := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 DATE    ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 VERSION ?= $(shell git describe --tags --always --dirty --match=v* 2>/dev/null | sed 's/^v//' || \
 			cat $(CURDIR)/.version 2> /dev/null || echo 0.0.0-unreleased)
-PKGS     = $(or $(PKG),$(shell $(GO) list ./... | grep -v "^$(PACKAGE)/vendor/"))
-TESTPKGS = $(shell $(GO) list -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS) 2>/dev/null)
+PKGS     = $(or $(PKG),$(shell $(GO) list -mod=readonly ./... | grep -v "^$(PACKAGE)/vendor/"))
+TESTPKGS = $(shell $(GO) list -mod=readonly -f '{{ if or .TestGoFiles .XTestGoFiles }}{{ .ImportPath }}{{ end }}' $(PKGS) 2>/dev/null)
 CMDS     = $(or $(CMD),$(addprefix cmd/,$(notdir $(shell find "$(PWD)/cmd/" -type d))))
 TIMEOUT  = 30
 
@@ -54,7 +54,7 @@ $(CMDS): vendor ; $(info building $@ ...) @
 # Helpers
 
 .PHONY: lint
-lint: ; $(info running $(GOLINT) ...)	@
+lint: vendor ; $(info running $(GOLINT) ...)	@
 	$(GOLINT) run
 
 .PHONY: lint-checkstyle
@@ -64,7 +64,7 @@ lint-checkstyle: vendor ; $(info running $(GOLINT) checkstyle ...)     @
 
 .PHONY: fmt
 fmt: ; $(info running gofmt ...)	@
-	@ret=0 && for d in $$($(GO) list -f '{{.Dir}}' ./... | grep -v /vendor/); do \
+	@ret=0 && for d in $$($(GO) list -mod=readonly -f '{{.Dir}}' ./... | grep -v /vendor/); do \
 		$(GOFMT) -l -w $$d/*.go || ret=$$? ; \
 	done ; exit $$ret
 
