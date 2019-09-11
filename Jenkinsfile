@@ -2,23 +2,14 @@
 
 pipeline {
 	agent {
-		docker {
-			image 'golang:1.13'
-			args '-u 0'
+		dockerfile {
+			filename 'Dockerfile.build'
 		 }
-	}
-	environment {
-		GOBIN = '/usr/local/bin'
-		DEBIAN_FRONTEND = 'noninteractive'
-		GOLANGCI_LINT_TAG = 'v1.18.0'
 	}
 	stages {
 		stage('Bootstrap') {
 			steps {
 				echo 'Bootstrapping..'
-				sh 'curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(GOBIN)/bin $(GOLANGCI_LINT_TAG)'
-				sh 'cd / && go get -v github.com/tebeka/go2xunit'
-				sh 'apt-get update && apt-get install -y build-essential'
 				sh 'go version'
 			}
 		}
