@@ -15,22 +15,26 @@
 #
 
 FROM golang:1.13-buster
-MAINTAINER Kopano Development <development@kopano.io>
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG GOLANGCI_LINT_TAG=v1.18.0
 RUN curl -sfL \
 	https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
 	sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_TAG}
 
-RUN GOBIN=/usr/local/bin go get -v github.com/tebeka/go2xunit
+RUN GOBIN=/usr/local/bin go get -v github.com/tebeka/go2xunit && go clean -cache
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && \
-	apt-get install -y build-essential
-
-ENV GOCACHE=/tmp/go-build
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		build-essential \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
-CMD [ "make", "DATE=reproducible" ]
+ENV GOCACHE=/tmp/go-build
+
+CMD ["make", "DATE=reproducible"]

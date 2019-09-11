@@ -15,7 +15,6 @@
 #
 
 FROM alpine:3.10
-MAINTAINER Kopano Development <development@kopano.io>
 
 RUN apk add --update --no-cache \
 	libcap \
