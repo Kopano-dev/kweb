@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+
+## v0.8.1 (2019-09-30)
+
+- Build with Go 1.13.1
 - Improve mod support in Makefile and linter
 - Udpate Dockerfiles syntax
 - Use Dockerfile.build in Jenkins
