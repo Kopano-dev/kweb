@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update third party dependencies to lates patch levels
+- Build with Go 1.13.3
 
 
 ## v0.8.1 (2019-09-30)
