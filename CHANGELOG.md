@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+
+
+## v0.8.2 (2019-10-28)
+
 - Update third party dependencies to lates patch levels
 - Build with Go 1.13.3
 
