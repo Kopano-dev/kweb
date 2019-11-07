@@ -4,6 +4,11 @@
 
 
 
+## v0.8.3 (2019-11-07)
+
+- Build with Go 1.13.4
+
+
 ## v0.8.2 (2019-10-28)
 
 - Update third party dependencies to lates patch levels
