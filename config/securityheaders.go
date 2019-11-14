@@ -16,6 +16,7 @@ func writeSecurityHeadersToCaddyfile(config *Config, buf *bytes.Buffer) error {
 	buf.WriteString("X-Content-Type-Options \"nosniff\"\n")
 	buf.WriteString("X-XSS-Protection \"1; mode=block\"\n")
 	buf.WriteString("Feature-Policy \"midi 'none'\"\n")
+    buf.WriteString("X-Robots-Tag" \"none\"\n")
 
 	// Add hsts when set and we have a host configured.
 	if config.HSTS != "" && config.Host != "" {
