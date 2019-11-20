@@ -24,7 +24,7 @@ pipeline {
 			steps {
 				echo 'Testing..'
 				sh 'make test-xml-short'
-				junit allowEmptyResults: true, testResults: 'test/tests.xml'
+				junit allowEmptyResults: false, testResults: 'test/tests.xml'
 			}
 		}
 		stage('Vendor') {
