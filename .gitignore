@@ -6,5 +6,6 @@
 /dist
 /Caddyfile
 /test/tests.*
+/test/coverage.*
 /3rdparty-LICENSES.md
 /www

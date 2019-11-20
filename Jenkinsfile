@@ -40,6 +40,14 @@ pipeline {
 				sh './bin/kwebd version && sha256sum ./bin/kwebd'
 			}
 		}
+		stage('Test with coverage') {
+			steps {
+				echo 'Testing with coverage..'
+				sh 'make test-coverage COVERAGE_DIR=test/coverage.jenkins || true'
+				publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'test/coverage.jenkins', reportFiles: 'coverage.html', reportName: 'Go Coverage Report HTML', reportTitles: ''])
+				step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'test/coverage.jenkins/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+			}
+		}
 		stage('Dist') {
 			steps {
 				echo 'Dist..'

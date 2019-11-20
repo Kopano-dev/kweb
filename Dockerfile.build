@@ -25,6 +25,9 @@ RUN curl -sfL \
 
 RUN GOBIN=/usr/local/bin go get -v \
 	github.com/tebeka/go2xunit \
+	github.com/axw/gocov/... \
+	github.com/AlekSi/gocov-xml \
+	github.com/wadey/gocovmerge \
 	&& go clean -cache && rm -rf /root/go
 
 ENV DEBIAN_FRONTEND noninteractive
