@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Bump linter to v1.21.0
+- Require unit tests to run in Jenkins pipeline
+- Add test coverage reporting
+- Add minimal version unit test
+- Improve build process
 
 
 ## v0.8.3 (2019-11-07)
