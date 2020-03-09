@@ -4,6 +4,11 @@
 
 
 
+## v0.9.1 (2020-03-09)
+
+- Use vendor folder to generate 3rd party license file
+
+
 ## v0.9.0 (2020-03-09)
 
 - Update 3rd party dependencies
