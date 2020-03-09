@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+
+
+## v0.9.0 (2020-03-09)
+
+- Update 3rd party dependencies
+- Build with Go 1.14
 - Bump linter to v1.21.0
 - Require unit tests to run in Jenkins pipeline
 - Add test coverage reporting
