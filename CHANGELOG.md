@@ -4,6 +4,12 @@
 
 
 
+## v0.9.2 (2020-06-15)
+
+- Update 3rd party dependencies
+- Build with Go 1.14.4
+
+
 ## v0.9.1 (2020-03-09)
 
 - Use vendor folder to generate 3rd party license file
