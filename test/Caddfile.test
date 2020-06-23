@@ -1,0 +1,22 @@
+127.0.0.1:8300 {
+    errors stderr
+    log stdout
+
+	# Allows long running PHP requests.
+    fastcgi2 /php-longrunning {%PHP_FPM_ENDPOINT%} php {
+        without /php-longrunning
+        root {%PHP_FPM_ROOT%}
+        read_timeout 3605s
+    }
+
+	# Case insensitive path rewrite.
+	rewrite / {
+		regexp (?i)^/test/case-insensitive.html
+		to /status-201
+	}
+
+	# Status helper, for testing.
+	status 201 {
+		/status-201
+	}
+}
