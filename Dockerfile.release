@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-FROM alpine:3.10
+ARG alpine_version=3.12
+FROM alpine:${alpine_version}
 
 RUN apk add --update --no-cache \
 	libcap \
@@ -25,7 +26,7 @@ RUN apk add --update --no-cache \
 EXPOSE 80 443 2015
 
 # Version to include in this Docker image. Default to latest.
-ENV VERSION latest
+ARG VERSION=latest
 
 # Define basic environment variables.
 ENV EXE=kwebd
