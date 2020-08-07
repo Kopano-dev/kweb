@@ -13,10 +13,10 @@ require (
 	github.com/mholt/certmagic v0.8.3
 	github.com/miekg/dns v1.1.29 // indirect
 	github.com/oschwald/maxminddb-golang v1.3.1 // indirect
-	github.com/prometheus/procfs v0.0.11 // indirect
+	github.com/prometheus/procfs v0.1.3 // indirect
 	github.com/pyed/ipfilter v1.1.4
 	github.com/russross/blackfriday v1.5.2 // indirect
-	github.com/spf13/cobra v0.0.7
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xuqingfeng/caddy-rate-limit v1.6.7
 	stash.kopano.io/kgol/caddy-prometheus v0.0.0-20190726090614-6055bc7a4bdf
