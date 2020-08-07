@@ -37,7 +37,8 @@ setup_env() {
 	if [ -z "$KOPANO_KWEB_ASSETS_PATH" ]; then
 		KOPANO_KWEB_ASSETS_PATH="/.kweb"
 	fi
-	mkdir -p "$KOPANO_KWEB_ASSETS_PATH" && chown -R ${KWEBD_USER}:${KWEBD_GROUP} "$KOPANO_KWEB_ASSETS_PATH"
+	mkdir -p "$KOPANO_KWEB_ASSETS_PATH"
+	chown -R ${KWEBD_USER}:${KWEBD_GROUP} "$KOPANO_KWEB_ASSETS_PATH" || true
 	export CADDYPATH="$KOPANO_KWEB_ASSETS_PATH"
 }
 setup_env
