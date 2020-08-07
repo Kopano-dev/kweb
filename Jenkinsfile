@@ -17,7 +17,7 @@ pipeline {
 			steps {
 				echo 'Linting..'
 				sh 'make lint-checkstyle'
-				checkstyle pattern: 'test/tests.lint.xml', canComputeNew: false, unstableTotalHigh: '100'
+				recordIssues qualityGates: [[threshold: 100, type: 'TOTAL', unstable: true]], tools: [goLint(pattern: 'test/tests.lint.xml')]
 			}
 		}
 		stage('Test') {
