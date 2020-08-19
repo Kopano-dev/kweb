@@ -171,6 +171,10 @@ func defaultLoader(cfg *config.Config) caddy.LoaderFunc {
 			return nil, err
 		}
 
+		if os.Getenv("KOPANO_KWEB_DUMP_INTERNAL_CADDYFILE") != "" {
+			fmt.Printf("%s\n", contents)
+		}
+
 		return caddy.CaddyfileInput{
 			Contents:       contents,
 			ServerTypeName: serverType,
