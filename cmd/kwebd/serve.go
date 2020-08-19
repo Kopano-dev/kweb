@@ -43,7 +43,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("revoke", "", "Hostname for which to revoke the certificate")
 	serveCmd.Flags().String("default-sni", certmagic.Default.DefaultServerName, "If a ClientHello ServerName is empty, use this ServerName to choose a TLS certificate")
 	serveCmd.Flags().String("request-log", "", "Log destination for request logging")
-	serveCmd.Flags().String("host", "0.0.0.0", "Hostname to serve")
+	serveCmd.Flags().String("host", "*", "Hostname to serve (use \"*\" to serve all hostnames)")
 	serveCmd.Flags().String("http-port", "80", "Port to use for HTTP")
 	serveCmd.Flags().String("https-port", "443", "Port to use for HTTPS")
 	serveCmd.Flags().String("bind", "", "IP to bind listener to (default \"0.0.0.0\")")

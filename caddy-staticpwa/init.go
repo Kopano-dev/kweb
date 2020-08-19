@@ -49,7 +49,7 @@ func setup(c *caddy.Controller) error {
 
 		host := cfg.Host()
 		ip := net.ParseIP(host)
-		if ip != nil {
+		if ip != nil || host == "*" {
 			// Not an IP address - assume it is a hostname.
 			host = ""
 		} else {
