@@ -4,6 +4,22 @@
 
 
 
+## v0.10.0 (2020-08-21)
+
+- Use extra.d directory instead of extra.cfg
+- Add support for extra configuration folder
+- Add knob to dump the internal auto generated Caddyfile
+- Change hostname default to * to accept all hostnames
+- Fix compatibility with Go 1.15
+- Move Jenkins warnings-ng to post phase
+- Update 3rd party dependencies
+- Add build args for Docker based builds
+- Build with Go 1.14.7
+- Allow chown to fail when running in Docker container
+- Use non-deprecated warnings-ng plugin in Jenkins
+- Add examples to test url routing and fastcgi timeouts
+
+
 ## v0.9.2 (2020-06-15)
 
 - Update 3rd party dependencies
