@@ -6,6 +6,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -116,7 +117,7 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	reverseProxyLegacyHTTP, _ := cmd.Flags().GetString("reverse-proxy-legacy-http")
 	defaultRedirect, _ := cmd.Flags().GetString("default-redirect")
-	extraFile, _ := cmd.Flags().GetString("extra")
+	extra, _ := cmd.Flags().GetString("extra")
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
@@ -141,12 +142,46 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 
 	// Conditionals.
-	if extraFile != "" {
-		extra, err := ioutil.ReadFile(path.Clean(extraFile))
-		if err != nil {
-			return fmt.Errorf("failed to read extra file: %v", err)
+	if extra != "" {
+		extra = path.Clean(extra)
+		var b bytes.Buffer
+		reader := func(fn string) error {
+			if data, err := ioutil.ReadFile(fn); err != nil {
+				return fmt.Errorf("failed to read extra file %s: %w", fn, err)
+			} else {
+				b.WriteString(fmt.Sprintf("# <-- extra (%s)\n", fn))
+				b.Write(data)
+				b.WriteString(fmt.Sprintf("# --> extra end (%s)\n\n", fn))
+			}
+			return nil
 		}
-		cfg.Extra = extra
+		// Extra can either be a file or folder.
+		stat, err := os.Stat(extra)
+		if err != nil {
+			return fmt.Errorf("failed to read extra configuration: %w", err)
+		}
+		if stat.IsDir() {
+			// Add all files in alphabetical order.
+			files, err := ioutil.ReadDir(extra)
+			if err != nil {
+				return fmt.Errorf("failed to read extra configuration directory: %w", err)
+			}
+			for _, f := range files {
+				fn := filepath.Join(extra, f.Name())
+				if filepath.Ext(fn) != ".cfg" {
+					continue
+				}
+				if err := reader(fn); err != nil {
+					return err
+				}
+			}
+		} else {
+			// Add configured file directly.
+			if err := reader(extra); err != nil {
+				return err
+			}
+		}
+		cfg.Extra = b.Bytes()
 	}
 
 	// Setup caddy.
