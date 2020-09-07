@@ -4,6 +4,11 @@
 
 
 
+## v0.10.1 (2020-09-06)
+
+- Build with Go 1.14.8
+
+
 ## v0.10.0 (2020-08-21)
 
 - Use extra.d directory instead of extra.cfg
