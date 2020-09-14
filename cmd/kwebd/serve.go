@@ -12,6 +12,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
+	"text/template"
 
 	"github.com/caddyserver/caddy"
 	"github.com/caddyserver/caddy/caddy/caddymain"
@@ -57,7 +61,9 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("hsts", "max-age=31536000;", "HTTP Strict Transport Security (default enabled when --host is given unless explicitly set to empty)")
 	serveCmd.Flags().String("reverse-proxy-legacy-http", "", "URL to reverse proxy requests for Webapp and Z-Push")
 	serveCmd.Flags().String("default-redirect", "", "URL to redirect to when no other path is given (/)")
-	serveCmd.Flags().String("extra", "", "Extra configuration file (append at the end)")
+	serveCmd.Flags().String("extra", "", "Path to extra configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
+	serveCmd.Flags().String("base", "", "Path to Base configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
+	serveCmd.Flags().String("snippets", "", "Path to snippets configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
 
 	return serveCmd
 }
@@ -117,7 +123,10 @@ func serve(cmd *cobra.Command, args []string) error {
 
 	reverseProxyLegacyHTTP, _ := cmd.Flags().GetString("reverse-proxy-legacy-http")
 	defaultRedirect, _ := cmd.Flags().GetString("default-redirect")
-	extra, _ := cmd.Flags().GetString("extra")
+
+	snippets, _ := getStringFlagOrEnv(cmd, "snippets", "KOPANO_KWEB_CFG_SNIPPETS_PATH")
+	base, _ := getStringFlagOrEnv(cmd, "base", "KOPANO_KWEB_CFG_BASE_PATH")
+	extra, _ := getStringFlagOrEnv(cmd, "extra", "KOPANO_KWEB_CFG_EXTRA_PATH")
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
@@ -141,45 +150,29 @@ func serve(cmd *cobra.Command, args []string) error {
 		DefaultRedirect:        defaultRedirect,
 	}
 
-	// Conditionals.
-	if extra != "" {
-		extra = path.Clean(extra)
+	// Snippets.
+	if snippets != "" {
 		var b bytes.Buffer
-		reader := func(fn string) error {
-			if data, err := ioutil.ReadFile(fn); err != nil {
-				return fmt.Errorf("failed to read extra file %s: %w", fn, err)
-			} else {
-				b.WriteString(fmt.Sprintf("# <-- extra (%s)\n", fn))
-				b.Write(data)
-				b.WriteString(fmt.Sprintf("# --> extra end (%s)\n\n", fn))
-			}
-			return nil
+		if err := loadD("snippets", snippets, &b, cfg); err != nil {
+			return err
 		}
-		// Extra can either be a file or folder.
-		stat, err := os.Stat(extra)
-		if err != nil {
-			return fmt.Errorf("failed to read extra configuration: %w", err)
+		cfg.Snippets = b.Bytes()
+	}
+
+	// Base.
+	if base != "" {
+		var b bytes.Buffer
+		if err := loadD("base", base, &b, cfg); err != nil {
+			return err
 		}
-		if stat.IsDir() {
-			// Add all files in alphabetical order.
-			files, err := ioutil.ReadDir(extra)
-			if err != nil {
-				return fmt.Errorf("failed to read extra configuration directory: %w", err)
-			}
-			for _, f := range files {
-				fn := filepath.Join(extra, f.Name())
-				if filepath.Ext(fn) != ".cfg" {
-					continue
-				}
-				if err := reader(fn); err != nil {
-					return err
-				}
-			}
-		} else {
-			// Add configured file directly.
-			if err := reader(extra); err != nil {
-				return err
-			}
+		cfg.Base = b.Bytes()
+	}
+
+	// Extra..
+	if extra != "" {
+		var b bytes.Buffer
+		if err := loadD("extra", extra, &b, cfg); err != nil {
+			return err
 		}
 		cfg.Extra = b.Bytes()
 	}
@@ -199,11 +192,19 @@ func serve(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func getStringFlagOrEnv(cmd *cobra.Command, name, env string) (string, error) {
+	v, _ := cmd.Flags().GetString(name)
+	if v == "" && env != "" {
+		v = os.Getenv(env)
+	}
+	return v, nil
+}
+
 func defaultLoader(cfg *config.Config) caddy.LoaderFunc {
 	return caddy.LoaderFunc(func(serverType string) (caddy.Input, error) {
 		contents, err := config.Caddyfile(cfg)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to load generated configuration: %w", err)
 		}
 
 		if os.Getenv("KOPANO_KWEB_DUMP_INTERNAL_CADDYFILE") != "" {
@@ -226,4 +227,101 @@ func setupAssetsPath() string {
 
 	os.Setenv("CADDYPATH", ap)
 	return ap
+}
+
+// byFileName is a custom sorter to ensure numeric file configuration files
+// from multiple directories are sorted with lowest numbers first.
+type byFileName []string
+
+func (a byFileName) Len() int      { return len(a) }
+func (a byFileName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byFileName) Less(i, j int) bool {
+	ifn := filepath.Base(a[i])
+	jfn := filepath.Base(a[j])
+
+	var in int64 = -1
+	ins := strings.SplitN(ifn, "-", 2)
+	if len(ins) > 1 {
+		in, _ = strconv.ParseInt(ins[0], 10, 64)
+	}
+
+	var jn int64 = -1
+	jns := strings.SplitN(jfn, "-", 2)
+	if len(jns) > 1 {
+		jn, _ = strconv.ParseInt(jns[0], 10, 64)
+	}
+
+	if in >= 0 {
+		if jn >= 0 {
+			if in != jn {
+				return in < jn
+			}
+			ifn = ins[1]
+			jfn = jns[1]
+		} else {
+			return true
+		}
+	}
+	return ifn < jfn
+}
+
+func loadD(name, pathString string, b *bytes.Buffer, context *config.Config) error {
+	paths := strings.Split(pathString, ":")
+
+	reader := func(fn string) error {
+		if t, err := template.ParseFiles(fn); err != nil {
+			return fmt.Errorf("failed to read %s file %s: %w", name, fn, err)
+		} else {
+			b.WriteString(fmt.Sprintf("# <-- %s \n", fn))
+			if err := t.Execute(b, context); err != nil {
+				return fmt.Errorf("failed to process %s file %s:%w", name, fn, err)
+			}
+			b.WriteString(fmt.Sprintf("# --> %s end\n\n", fn))
+		}
+		return nil
+	}
+
+	load := []string{}
+	seen := make(map[string]bool)
+
+	for _, p := range paths {
+		p = path.Clean(p)
+		// Extra can either be a file or folder.
+		stat, err := os.Stat(p)
+		if err != nil {
+			return fmt.Errorf("failed to read %s configuration: %w", name, err)
+		}
+		if stat.IsDir() {
+			// Add all files in alphabetical order.
+			files, err := ioutil.ReadDir(p)
+			if err != nil {
+				return fmt.Errorf("failed to read %s configuration directory: %w", name, err)
+			}
+			for _, f := range files {
+				fn := f.Name()
+				if filepath.Ext(fn) != ".cfg" {
+					continue
+				}
+				if seen[fn] {
+					// Skip files which were already seen.
+					continue
+				}
+				seen[fn] = true
+				fn = filepath.Join(p, fn)
+				load = append(load, fn)
+			}
+		} else {
+			// Add configured file directly.
+			load = append(load, p)
+		}
+	}
+
+	sort.Sort(byFileName(load))
+	for _, f := range load {
+		if err := reader(f); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

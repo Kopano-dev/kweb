@@ -16,6 +16,8 @@ DEFAULT_HTTPS_PORT=443
 DEFAULT_HTTP_PORT=80
 DEFAULT_HTTPS_PORT_ALTERNATE=9443
 DEFAULT_HTTP_PORT_ALTERNATE=9080
+DEFAULT_BASE_CONFIG=/etc/kopano/kweb/overrides.d:/usr/share/kopano-kweb/defaults.d
+DEFAULT_SNIPPETS_CONFIG=/etc/kopano/kweb/snippets.d:/usr/share/kopano-kweb/snippets.d
 DEFAULT_EXTRA_CONFIG=/etc/kopano/kweb/extra.d
 DEFAULT_ASSETS_PATH=/etc/kopano/kweb/.kweb
 DEFAULT_STATICPWA_PATH_PATTERN=/usr/share/kopano-%name/%path
@@ -77,6 +79,18 @@ case "${1}" in
 				http_port=$DEFAULT_HTTP_PORT_ALTERNATE
 			else
 				http_port=$DEFAULT_HTTP_PORT
+			fi
+		fi
+
+		if [ -z "$base" ]; then
+			if [ -e "$DEFAULT_BASE_CONFIG" ]; then
+				base=$DEFAULT_BASE_CONFIG
+			fi
+		fi
+
+		if [ -z "$snippets" ]; then
+			if [ -e "$DEFAULT_SNIPPETS_CONFIG" ]; then
+				snippets=$DEFAULT_SNIPPETS_CONFIG
 			fi
 		fi
 
@@ -152,6 +166,14 @@ case "${1}" in
 
 		if [ -n "$legacy_reverse_proxy" ]; then
 			set -- "$@" --reverse-proxy-legacy-http="$legacy_reverse_proxy"
+		fi
+
+		if [ -n "$base" ]; then
+			set -- "$@" --base="$base"
+		fi
+
+		if [ -n "$snippets" ]; then
+			set -- "$@" --snippets="$snippets"
 		fi
 
 		if [ -n "$extra" ]; then
