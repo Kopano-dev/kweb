@@ -4,7 +4,15 @@
 
 
 
-## v0.11.0 (2020-09-14)
+## v0.11.1 (2020-09-15)
+
+- Relax config file exist check
+- Initialize process log on stdout
+- Add marker around config dump output
+- Fix passing of parameters for combined folders
+
+
+## v0.11.0 (2020-09-15)
 
 - Make configuration flexible and overridable
 
