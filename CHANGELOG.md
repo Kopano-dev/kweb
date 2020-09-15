@@ -4,8 +4,14 @@
 
 
 
-## v0.10.1 (2020-09-06)
+## v0.11.0 (2020-09-14)
 
+- Make configuration flexible and overridable
+
+
+## v0.10.1 (2020-09-07)
+
+- v0.10.1
 - Build with Go 1.14.8
 
 
