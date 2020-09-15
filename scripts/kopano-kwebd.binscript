@@ -83,19 +83,19 @@ case "${1}" in
 		fi
 
 		if [ -z "$base" ]; then
-			if [ -e "$DEFAULT_BASE_CONFIG" ]; then
+			if [ -n "$DEFAULT_BASE_CONFIG" ]; then
 				base=$DEFAULT_BASE_CONFIG
 			fi
 		fi
 
 		if [ -z "$snippets" ]; then
-			if [ -e "$DEFAULT_SNIPPETS_CONFIG" ]; then
+			if [ -n "$DEFAULT_SNIPPETS_CONFIG" ]; then
 				snippets=$DEFAULT_SNIPPETS_CONFIG
 			fi
 		fi
 
 		if [ -z "$extra" ]; then
-			if [ -e "$DEFAULT_EXTRA_CONFIG" ]; then
+			if [ -n "$DEFAULT_EXTRA_CONFIG" ]; then
 				extra=$DEFAULT_EXTRA_CONFIG
 			fi
 		fi
