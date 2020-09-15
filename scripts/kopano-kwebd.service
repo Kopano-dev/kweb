@@ -26,7 +26,7 @@ Environment=LC_CTYPE=en_US.UTF-8
 Environment=KOPANO_KWEB_ASSETS_PATH=/etc/kopano/kweb/.kweb
 EnvironmentFile=-/etc/kopano/kwebd.cfg
 ExecStartPre=/usr/sbin/kopano-kwebd setup
-ExecStart=/usr/sbin/kopano-kwebd serve
+ExecStart=/usr/sbin/kopano-kwebd serve --log-timestamps=false
 
 [Install]
 WantedBy=multi-user.target

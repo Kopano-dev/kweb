@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -23,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"stash.kopano.io/kgol/kweb/config"
+	"stash.kopano.io/kgol/kweb/version"
 )
 
 func commandServe() *cobra.Command {
@@ -48,6 +50,7 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("revoke", "", "Hostname for which to revoke the certificate")
 	serveCmd.Flags().String("default-sni", certmagic.Default.DefaultServerName, "If a ClientHello ServerName is empty, use this ServerName to choose a TLS certificate")
 	serveCmd.Flags().String("request-log", "", "Log destination for request logging")
+	serveCmd.Flags().Bool("log-timestamps", true, "Enable timestamps for the process log")
 	serveCmd.Flags().String("host", "*", "Hostname to serve (use \"*\" to serve all hostnames)")
 	serveCmd.Flags().String("http-port", "80", "Port to use for HTTP")
 	serveCmd.Flags().String("https-port", "443", "Port to use for HTTPS")
@@ -103,6 +106,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	httpsPort, _ := cmd.Flags().GetString("https-port")
 	bind, _ := cmd.Flags().GetString("bind")
 	requestLog, _ := cmd.Flags().GetString("request-log")
+	logTimestamps, _ := cmd.Flags().GetBool("log-timestamps")
 	tls, _ := cmd.Flags().GetBool("tls")
 	tlsAlwaysSelfSign, _ := cmd.Flags().GetBool("tls-always-self-sign")
 	tlsMustStaple, _ := cmd.Flags().GetBool("tls-must-staple")
@@ -111,7 +115,12 @@ func serve(cmd *cobra.Command, args []string) error {
 	tlsPrivateKey, _ := cmd.Flags().GetString("tls-key-file")
 	hsts, _ := cmd.Flags().GetString("hsts")
 
-	caddyArgs = append(caddyArgs, "-root", root, "-host", host, "-http-port", httpPort, "-https-port", httpsPort)
+	if !logTimestamps {
+		// Disable timestamps for logging.
+		log.SetFlags(0)
+	}
+
+	caddyArgs = append(caddyArgs, "-root", root, "-host", host, "-http-port", httpPort, "-https-port", httpsPort, "-log", "stdout")
 	if tls {
 		caddyArgs = append(caddyArgs, "-port", httpsPort)
 	} else {
@@ -187,6 +196,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	subArgs := append(os.Args[:1], caddyArgs...)
 	os.Args = subArgs
 
+	log.Printf("[INFO] Kweb version: %v\n", version.Version)
 	caddymain.Run()
 
 	return nil
