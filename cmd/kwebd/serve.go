@@ -296,13 +296,19 @@ func loadD(name, pathString string, b *bytes.Buffer, context *config.Config) err
 	load := []string{}
 	seen := make(map[string]bool)
 
+	found := false
 	for _, p := range paths {
 		p = path.Clean(p)
 		// Extra can either be a file or folder.
 		stat, err := os.Stat(p)
 		if err != nil {
+			if os.IsNotExist(err) {
+				log.Printf("[WARNING] Config for %s (%s) not found, skipped\n", p, name)
+				continue
+			}
 			return fmt.Errorf("failed to read %s configuration: %w", name, err)
 		}
+		found = true
 		if stat.IsDir() {
 			// Add all files in alphabetical order.
 			files, err := ioutil.ReadDir(p)
@@ -326,6 +332,9 @@ func loadD(name, pathString string, b *bytes.Buffer, context *config.Config) err
 			// Add configured file directly.
 			load = append(load, p)
 		}
+	}
+	if !found {
+		return fmt.Errorf("no configuration found for %s, refusing to start", name)
 	}
 
 	sort.Sort(byFileName(load))
