@@ -208,7 +208,9 @@ func defaultLoader(cfg *config.Config) caddy.LoaderFunc {
 		}
 
 		if os.Getenv("KOPANO_KWEB_DUMP_INTERNAL_CADDYFILE") != "" {
+			fmt.Println("----- internal configuration start -----")
 			fmt.Printf("%s\n", contents)
+			fmt.Println("----- internal configuration end -----")
 		}
 
 		return caddy.CaddyfileInput{
