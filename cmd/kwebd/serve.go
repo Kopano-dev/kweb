@@ -168,15 +168,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		cfg.Snippets = b.Bytes()
 	}
 
-	// Base.
-	if base != "" {
-		var b bytes.Buffer
-		if err := loadD("base", base, &b, cfg); err != nil {
-			return err
-		}
-		cfg.Base = b.Bytes()
-	}
-
 	// Extra..
 	if extra != "" {
 		var b bytes.Buffer
@@ -184,6 +175,15 @@ func serve(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		cfg.Extra = b.Bytes()
+	}
+
+	// Base.
+	if base != "" {
+		var b bytes.Buffer
+		if err := loadD("base", base, &b, cfg); err != nil {
+			return err
+		}
+		cfg.Base = b.Bytes()
 	}
 
 	// Setup caddy.
