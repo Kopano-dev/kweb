@@ -5,6 +5,10 @@
 
 package config
 
+import (
+	"strings"
+)
+
 // Config bundles a bunch of configuration settings.
 type Config struct {
 	Root string
@@ -27,7 +31,16 @@ type Config struct {
 	ReverseProxyLegacyHTTP string
 	DefaultRedirect        string
 
-	Snippets []byte
-	Base     []byte
-	Extra    []byte
+	HTTPPortString  string
+	HTTPSPortString string
+
+	HostsD    []byte
+	SnippetsD []byte
+	DefaultsD []byte
+	ExtraD    []byte
+}
+
+// Hosts returns all hosts of the associcated Config.Host field as string slice.
+func (c *Config) Hosts() []string {
+	return strings.Split(c.Host, " ")
 }

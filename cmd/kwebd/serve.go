@@ -64,9 +64,10 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("hsts", "max-age=31536000;", "HTTP Strict Transport Security (default enabled when --host is given unless explicitly set to empty)")
 	serveCmd.Flags().String("reverse-proxy-legacy-http", "", "URL to reverse proxy requests for Webapp and Z-Push")
 	serveCmd.Flags().String("default-redirect", "", "URL to redirect to when no other path is given (/)")
-	serveCmd.Flags().String("extra", "", "Path to extra configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
-	serveCmd.Flags().String("base", "", "Path to Base configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
-	serveCmd.Flags().String("snippets", "", "Path to snippets configuration file or folder with .cfg files, separate multiple with : (ealier entries have priority)")
+	serveCmd.Flags().String("extra", "", "Path to extra configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
+	serveCmd.Flags().String("base", "", "Path to Base configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
+	serveCmd.Flags().String("snippets", "", "Path to snippets configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
+	serveCmd.Flags().String("hosts", "", "Path to hosts configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
 
 	return serveCmd
 }
@@ -136,6 +137,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	snippets, _ := getStringFlagOrEnv(cmd, "snippets", "KOPANO_KWEB_CFG_SNIPPETS_PATH")
 	base, _ := getStringFlagOrEnv(cmd, "base", "KOPANO_KWEB_CFG_BASE_PATH")
 	extra, _ := getStringFlagOrEnv(cmd, "extra", "KOPANO_KWEB_CFG_EXTRA_PATH")
+	hosts, _ := getStringFlagOrEnv(cmd, "hosts", "KOPANO_KWEB_CFG_HOSTS_PATH")
 
 	// Configure underlying caddy.
 	cfg := &config.Config{
@@ -158,6 +160,12 @@ func serve(cmd *cobra.Command, args []string) error {
 		ReverseProxyLegacyHTTP: reverseProxyLegacyHTTP,
 		DefaultRedirect:        defaultRedirect,
 	}
+	if httpPort != "80" {
+		cfg.HTTPPortString = fmt.Sprintf(":%s", httpPort)
+	}
+	if httpsPort != "443" {
+		cfg.HTTPSPortString = fmt.Sprintf(":%s", httpsPort)
+	}
 
 	// Snippets.
 	if snippets != "" {
@@ -165,7 +173,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		if err := loadD("snippets", snippets, &b, cfg); err != nil {
 			return err
 		}
-		cfg.Snippets = b.Bytes()
+		cfg.SnippetsD = b.Bytes()
 	}
 
 	// Extra..
@@ -174,16 +182,24 @@ func serve(cmd *cobra.Command, args []string) error {
 		if err := loadD("extra", extra, &b, cfg); err != nil {
 			return err
 		}
-		cfg.Extra = b.Bytes()
+		cfg.ExtraD = b.Bytes()
 	}
 
-	// Base.
+	// Base defaults.
 	if base != "" {
 		var b bytes.Buffer
 		if err := loadD("base", base, &b, cfg); err != nil {
 			return err
 		}
-		cfg.Base = b.Bytes()
+		cfg.DefaultsD = b.Bytes()
+	}
+
+	if hosts != "" {
+		var b bytes.Buffer
+		if err := loadD("hosts", hosts, &b, cfg); err != nil {
+			return err
+		}
+		cfg.HostsD = b.Bytes()
 	}
 
 	// Setup caddy.

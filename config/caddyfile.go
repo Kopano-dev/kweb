@@ -13,8 +13,8 @@ import (
 func Caddyfile(config *Config) ([]byte, error) {
 	var buf = &bytes.Buffer{}
 
-	// Add base.
-	err := writeBaseToCaddyfile(config, buf)
+	// Add hosts.
+	err := writeHostsToCaddyfile(config, buf)
 	if err != nil {
 		return nil, err
 	}

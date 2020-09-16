@@ -34,8 +34,9 @@ ENV EXE=kwebd
 # Defaults which can be overwritten.
 ENV KOPANO_KWEB_ASSETS_PATH=/.kweb
 ENV KOPANO_KWEB_CFG_SNIPPETS_PATH=/var/lib/kwebd-docker/snippets.d
-ENV KOPANO_KWEB_CFG_BASE_PATH=/etc/kopano/kweb/extra.d
-ENV KOPANO_KWEB_CFG_EXTRA_PATH=/etc/kopano/kweb/overrides.d:/var/lib/kwebd-docker/defaults.d
+ENV KOPANO_KWEB_CFG_EXTRA_PATH=/etc/kopano/kweb/extra.d
+ENV KOPANO_KWEB_CFG_BASE_PATH=/etc/kopano/kweb/overrides.d:/var/lib/kwebd-docker/defaults.d
+ENV KOPANO_KWEB_CFG_HOSTS_PATH=/etc/kopano/kweb/hosts.d:/var/lib/kwebd-docker/hosts.d
 ENV ARGS=""
 
 # User and group defaults.

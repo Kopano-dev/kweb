@@ -9,9 +9,9 @@ import (
 	"io"
 )
 
-func writeBaseToCaddyfile(config *Config, w io.Writer) error {
-	// Add base.
-	_, err := w.Write(config.Base)
+func writeHostsToCaddyfile(config *Config, w io.Writer) error {
+	// Add hosts.
+	_, err := w.Write(config.HostsD)
 
 	return err
 }
