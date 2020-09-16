@@ -46,11 +46,6 @@ case "${1}" in
 			mkdir -p "$KOPANO_KWEB_ASSETS_PATH" && chown "$USER" "$KOPANO_KWEB_ASSETS_PATH" && touch "$KOPANO_KWEB_ASSETS_PATH/.setup-done"
 		fi
 
-		if [ -n "$request_log_file" -a -n "$USER" ]; then
-			mkdir -p "$(dirname ${request_log_file})"
-			touch -a "$request_log_file" && chown "$USER" "$request_log_file"
-		fi
-
 		# Setup subcommand does nothing.
 		exit 0
 
