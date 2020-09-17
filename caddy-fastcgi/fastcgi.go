@@ -343,7 +343,13 @@ func (h Handler) buildEnv(r *http.Request, rule Rule, upath string, fpath string
 			env["SSL_PROTOCOL"] = v
 		}
 		// and pass the cipher suite in a manner compatible with apache's mod_ssl
-		for k, v := range caddytls.SupportedCiphersMap {
+		var m map[string]uint16
+		if r.TLS.Version == tls.VersionTLS13 {
+			m = tls13SupportedCiphersMap
+		} else {
+			m = caddytls.SupportedCiphersMap
+		}
+		for k, v := range m {
 			if v == r.TLS.CipherSuite {
 				env["SSL_CIPHER"] = k
 				break
@@ -510,4 +516,12 @@ var tlsProtocolStringToMap = map[uint16]string{
 	tls.VersionTLS10: "TLSv1",
 	tls.VersionTLS11: "TLSv1.1",
 	tls.VersionTLS12: "TLSv1.2",
+	tls.VersionTLS13: "TLSv1.3",
+}
+
+// Map of the TLSv1.3 cipher suites.
+var tls13SupportedCiphersMap = map[string]uint16{
+	"TLS_AES_128_GCM_SHA256":       tls.TLS_AES_128_GCM_SHA256,
+	"TLS_AES_256_GCM_SHA384":       tls.TLS_AES_256_GCM_SHA384,
+	"TLS_CHACHA20_POLY1305_SHA256": tls.TLS_AES_256_GCM_SHA384,
 }
