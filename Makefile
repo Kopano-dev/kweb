@@ -150,6 +150,7 @@ dist: 3rdparty-LICENSES.md ; $(info building dist tarball ...)
 	@rm -rf "dist/${PACKAGE_NAME}-${VERSION}"
 	@mkdir -p "dist/${PACKAGE_NAME}-${VERSION}"
 	@mkdir -p "dist/${PACKAGE_NAME}-${VERSION}/scripts"
+	@mkdir -p "dist/${PACKAGE_NAME}-${VERSION}/snippets.d"
 	@mkdir -p "dist/${PACKAGE_NAME}-${VERSION}/defaults.d"
 	@mkdir -p "dist/${PACKAGE_NAME}-${VERSION}/hosts.d"
 	@cd dist && \
@@ -162,6 +163,7 @@ dist: 3rdparty-LICENSES.md ; $(info building dist tarball ...)
 	cp -avf ../scripts/kwebd.cfg "${PACKAGE_NAME}-${VERSION}/scripts" && \
 	cp -avf ../scripts/robots.txt "${PACKAGE_NAME}-${VERSION}/scripts" && \
 	cp -avf ../scripts/favicon.ico "${PACKAGE_NAME}-${VERSION}/scripts" && \
+	cp -avf ../snippets.d/*.cfg "${PACKAGE_NAME}-${VERSION}/snippets.d" && \
 	cp -avf ../defaults.d/*.cfg "${PACKAGE_NAME}-${VERSION}/defaults.d" && \
 	cp -avf ../hosts.d/*.cfg "${PACKAGE_NAME}-${VERSION}/hosts.d" && \
 	tar --owner=0 --group=0 -czvf ${PACKAGE_NAME}-${VERSION}.tar.gz "${PACKAGE_NAME}-${VERSION}" && \

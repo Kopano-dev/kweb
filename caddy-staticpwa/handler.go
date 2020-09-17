@@ -31,7 +31,12 @@ const (
 
 // StaticPWAHandler is a handler for static progressive webapps.
 type StaticPWAHandler struct {
-	host    string
+	host string
+
+	IndexCSPTemplate string
+	StaticDefaultCSP string
+	StaticSVGCSP     string
+
 	appURL  string
 	handler http.Handler
 	fs      http.Dir
@@ -134,9 +139,13 @@ func (h *StaticPWAHandler) handle(w http.ResponseWriter, r *http.Request) {
 		// Long term caching for static resources.
 		headers.Set("Cache-Control", "public, max-age=31536000")
 		if strings.HasSuffix(name, ".svg") {
-			headers.Set("Content-Security-Policy", staticSVGCSP)
+			if h.StaticSVGCSP != "" {
+				headers.Set("Content-Security-Policy", h.StaticSVGCSP)
+			}
 		} else {
-			headers.Set("Content-Security-Policy", staticDefaultCSP)
+			if h.StaticDefaultCSP != "" {
+				headers.Set("Content-Security-Policy", h.StaticDefaultCSP)
+			}
 		}
 
 	default:

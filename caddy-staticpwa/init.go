@@ -24,25 +24,46 @@ func init() {
 
 func setup(c *caddy.Controller) error {
 	for c.Next() {
+		args := c.RemainingArgs()
+
+		if len(args) < 2 || len(args) > 3 {
+			return c.ArgErr()
+		}
 		// First param is the url prefix.
-		if !c.NextArg() {
-			return c.ArgErr()
-		}
-		url := c.Val()
-
+		url := args[0]
 		// Second param is mandatory and the path to the static pwa folder.
-		if !c.NextArg() {
-			return c.ArgErr()
-		}
-		path := c.Val()
-
+		path := args[1]
 		// Third parm is optional and defines the name of the pwa.
 		name := ""
-		if c.NextArg() {
-			name = c.Val()
+		if len(args) > 2 {
+			name = args[2]
 		}
 		if name == "" {
 			name = strings.Replace(strings.TrimPrefix(url, "/"), "/", "-", -1)
+		}
+
+		var indexCSPTemplate string
+		var staticDefaultCSP string
+		var staticSVGCSP string
+
+		for c.NextBlock() {
+			switch c.Val() {
+			case "csp_index":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+				indexCSPTemplate = c.Val()
+			case "csp_default":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+				staticDefaultCSP = c.Val()
+			case "csp_svg":
+				if !c.NextArg() {
+					return c.ArgErr()
+				}
+				staticSVGCSP = c.Val()
+			}
 		}
 
 		cfg := httpserver.GetConfig(c)
@@ -62,7 +83,7 @@ func setup(c *caddy.Controller) error {
 
 		// Inject our middle ware.
 		mid := func(next httpserver.Handler) httpserver.Handler {
-			return NewStaticPWAHandler(
+			h := NewStaticPWAHandler(
 				host,
 				cfg.Root,
 				name,
@@ -70,6 +91,11 @@ func setup(c *caddy.Controller) error {
 				path,
 				next,
 			)
+			h.IndexCSPTemplate = indexCSPTemplate
+			h.StaticDefaultCSP = staticDefaultCSP
+			h.StaticSVGCSP = staticSVGCSP
+
+			return h
 		}
 		cfg.AddMiddleware(mid)
 	}
