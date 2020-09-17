@@ -297,15 +297,22 @@ func loadD(name, pathString string, b *bytes.Buffer, context *config.Config) err
 	paths := strings.Split(pathString, ":")
 
 	reader := func(fn string) error {
-		if t, err := template.ParseFiles(fn); err != nil {
+		data, err := ioutil.ReadFile(fn)
+		if err != nil {
 			return fmt.Errorf("failed to read %s file %s: %w", name, fn, err)
-		} else {
-			b.WriteString(fmt.Sprintf("# <-- %s \n", fn))
-			if err := t.Execute(b, context); err != nil {
-				return fmt.Errorf("failed to process %s file %s:%w", name, fn, err)
-			}
-			b.WriteString(fmt.Sprintf("# --> %s end\n\n", fn))
 		}
+		t := template.New(fn)
+		t.Delims("{%", "%}")
+		t, err = t.Parse(string(data))
+		if err != nil {
+			return fmt.Errorf("failed to read %s file %s: %w", name, fn, err)
+		}
+		b.WriteString(fmt.Sprintf("# <-- %s \n", fn))
+		err = t.Execute(b, context)
+		if err != nil {
+			return fmt.Errorf("failed to process %s file %s:%w", name, fn, err)
+		}
+		b.WriteString(fmt.Sprintf("# --> %s end\n\n", fn))
 		return nil
 	}
 
