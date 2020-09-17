@@ -4,6 +4,20 @@
 
 
 
+## v0.12.0 (2020-09-17)
+
+- Add Referrer-Policy: no-referrer for WebApp
+- Move static PWA CSP to configuration
+- Make rate limiting flexible via configuration
+- Remove builtin routes for obsolte kwmserver v1 API
+- Change kweb config generator template syntax
+- Refactor built in config to allow multiple hosts
+- Hide KDAV version response header
+- Add log rotation to requests log
+- Use better example for request log file location
+- Fix extra.d configuration support
+
+
 ## v0.11.1 (2020-09-15)
 
 - Relax config file exist check
