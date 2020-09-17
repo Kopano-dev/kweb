@@ -68,6 +68,8 @@ func commandServe() *cobra.Command {
 	serveCmd.Flags().String("base", "", "Path to Base configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
 	serveCmd.Flags().String("snippets", "", "Path to snippets configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
 	serveCmd.Flags().String("hosts", "", "Path to hosts configuration file or folder with .cfg files, separate multiple with : (earlier entries have priority)")
+	serveCmd.Flags().String("ratelimit-whitelist", "127.0.0.1/8", "CIDR range of IPs to exclude from rate limiting (default \"127.0.0.1/8\"), separate multiple with ,")
+	serveCmd.Flags().String("ratelimit-rate", "100 200 minute", "Rate for rate limiting in format \"rate burst unit\" (default \"100 200 minute\")")
 
 	return serveCmd
 }
@@ -115,6 +117,8 @@ func serve(cmd *cobra.Command, args []string) error {
 	tlsCertBundle, _ := cmd.Flags().GetString("tls-cert-file")
 	tlsPrivateKey, _ := cmd.Flags().GetString("tls-key-file")
 	hsts, _ := cmd.Flags().GetString("hsts")
+	ratelimitWhitelist, _ := cmd.Flags().GetString("ratelimit-whitelist")
+	ratelimitRate, _ := cmd.Flags().GetString("ratelimit-rate")
 
 	if !logTimestamps {
 		// Disable timestamps for logging.
@@ -159,6 +163,9 @@ func serve(cmd *cobra.Command, args []string) error {
 
 		ReverseProxyLegacyHTTP: reverseProxyLegacyHTTP,
 		DefaultRedirect:        defaultRedirect,
+
+		RatelimitWhitelist: ratelimitWhitelist,
+		RatelimitRate:      ratelimitRate,
 	}
 	if httpPort != "80" {
 		cfg.HTTPPortString = fmt.Sprintf(":%s", httpPort)

@@ -31,6 +31,9 @@ type Config struct {
 	ReverseProxyLegacyHTTP string
 	DefaultRedirect        string
 
+	RatelimitWhitelist string
+	RatelimitRate      string
+
 	HTTPPortString  string
 	HTTPSPortString string
 

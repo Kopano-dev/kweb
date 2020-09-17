@@ -170,6 +170,14 @@ case "${1}" in
 			set -- "$@" --reverse-proxy-legacy-http="$legacy_reverse_proxy"
 		fi
 
+		if [ -n "$ratelimit_rate" ]; then
+			set -- "$@" --ratelimit-rate="$ratelimit_rate"
+		fi
+
+		if [ -n "$ratelimit_whitelist" ]; then
+			set -- "$@" --ratelimit-whitelist="$ratelimit_whitelist"
+		fi
+
 		if [ -n "$hosts_cfg" ]; then
 			set -- "$@" --hosts="$hosts_cfg"
 		fi
