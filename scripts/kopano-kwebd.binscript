@@ -43,6 +43,13 @@ case "${1}" in
 		# Initialize environment.
 		setup_env
 
+		if [ -n "$request_log_file" -a -n "$USER" ]; then
+			request_log_folder=$(dirname ${request_log_file})
+			if [ ! -e "${request_log_folder}" ]; then
+				mkdir -p "${request_log_folder}" && chmod 640 "${request_log_folder}" && chown "$USER" "${request_log_folder}"
+			fi
+		fi
+
 		if [ ! -e "$KOPANO_KWEB_ASSETS_PATH/.setup-done" -a -n "$USER" ]; then
 			mkdir -p "$KOPANO_KWEB_ASSETS_PATH" && chown "$USER" "$KOPANO_KWEB_ASSETS_PATH" && touch "$KOPANO_KWEB_ASSETS_PATH/.setup-done"
 		fi
