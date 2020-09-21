@@ -4,6 +4,13 @@
 
 
 
+## v0.12.1 (2020-09-21)
+
+- Ensure that default request log path is actually created
+- Clarify ACME agree config file options
+- Fix fastcgi2 to support SSL variables when TLSv1.3 is used
+
+
 ## v0.12.0 (2020-09-17)
 
 - Add Referrer-Policy: no-referrer for WebApp
