@@ -4,6 +4,11 @@
 
 
 
+## v0.12.2 (2020-09-21)
+
+- Improve request log file creation logic
+
+
 ## v0.12.1 (2020-09-21)
 
 - Ensure that default request log path is actually created
