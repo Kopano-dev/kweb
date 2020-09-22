@@ -15,10 +15,12 @@
 package alias
 
 import (
+	"context"
 	"net/http"
 	"path/filepath"
 	"strings"
 
+	"github.com/caddyserver/caddy"
 	"github.com/caddyserver/caddy/caddyhttp/httpserver"
 	"github.com/caddyserver/caddy/caddyhttp/staticfiles"
 )
@@ -62,6 +64,8 @@ func (h *AliasHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) (int, e
 		if r.URL.RawPath != "" {
 			r.URL.RawPath = strings.TrimPrefix(r.URL.RawPath, h.url)
 		}
+		c := context.WithValue(r.Context(), caddy.CtxKey("path_prefix"), h.url)
+		r = r.WithContext(c)
 
 		return h.handler.ServeHTTP(w, r)
 	}
