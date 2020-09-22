@@ -4,6 +4,11 @@
 
 
 
+## v0.12.3 (2020-09-22)
+
+- Fix alias directive redirect targets
+
+
 ## v0.12.2 (2020-09-21)
 
 - Improve request log file creation logic
