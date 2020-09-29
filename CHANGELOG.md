@@ -4,6 +4,12 @@
 
 
 
+## v0.12.4 (2020-09-29)
+
+- Explicitly define backend read and write timeouts
+- Limit automatic gzip file extensions
+
+
 ## v0.12.3 (2020-09-22)
 
 - Fix alias directive redirect targets
