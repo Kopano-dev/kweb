@@ -20,4 +20,6 @@ require (
 	stash.kopano.io/kgol/caddy-prometheus v0.0.0-20190726090614-6055bc7a4bdf
 )
 
-replace github.com/lucas-clemente/quic-go => github.com/lucas-clemente/quic-go v0.7.1-0.20200818072714-1d8e4c08910c
+replace github.com/caddyserver/caddy => github.com/longsleep/caddy v1.0.6-0.20210628124956-7674cf3ebc0b
+
+replace github.com/lucas-clemente/quic-go => github.com/lucas-clemente/quic-go v0.21.1
