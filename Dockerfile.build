@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-FROM golang:1.14.8-buster
+FROM golang:1.16.5-buster
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
