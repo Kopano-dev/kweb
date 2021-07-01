@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Build with Go 1.16
+- Bump golangci-linter to 1.41.1
+- Update quic to support final HTTP3 specification
+- Fix request_log folder creation check to avoid changing owner
+- Mark mcu and admin API of kwmserver internal
 
 
 ## v0.12.4 (2020-09-29)
