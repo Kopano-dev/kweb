@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+
+
+## v0.13.0 (2021-10-08)
+
+- Build with Go 1.17.2
+- Fix proxy healthcheck support for unix upstreams
 - Build with Go 1.16
 - Bump golangci-linter to 1.41.1
 - Update quic to support final HTTP3 specification
