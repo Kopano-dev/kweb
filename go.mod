@@ -23,3 +23,5 @@ require (
 replace github.com/caddyserver/caddy => github.com/longsleep/caddy v1.0.6-0.20211008153515-2e836ef87ed2
 
 replace github.com/lucas-clemente/quic-go => github.com/lucas-clemente/quic-go v0.21.1
+
+replace golang.org/x/net => golang.org/x/net v0.0.0-20211209124913-491a49abca63
