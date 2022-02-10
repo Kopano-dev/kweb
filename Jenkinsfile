@@ -59,7 +59,7 @@ pipeline {
 		always {
 			junit allowEmptyResults: false, testResults: 'test/tests.xml'
 
-			recordIssues enabledForFailure: true, qualityGates: [[threshold: 100, type: 'TOTAL', unstable: true]], tools: [checkStyle(pattern: 'test/tests.lint.xml')]
+			recordIssues enabledForFailure: true, qualityGates: [[threshold: 200, type: 'TOTAL', unstable: true]], tools: [checkStyle(pattern: 'test/tests.lint.xml')]
 
 			archiveArtifacts 'dist/*.tar.gz'
 			cleanWs()
