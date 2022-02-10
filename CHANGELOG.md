@@ -4,6 +4,17 @@
 
 
 
+## v0.14.0 (2022-02-10)
+
+- Update HTTP/3 support library
+- Build with Go 1.17.6
+- Raise checkstyle quality gate to 200
+- Fix all reauth unit tests
+- Properly set remote user when authenticating with reauth
+- Hook up reauth plugin as embeeded plugin
+- Import reauth plugin
+
+
 ## v0.13.1 (2021-12-09)
 
 - Build with Go 1.17.5
