@@ -35,7 +35,7 @@ import (
 type Backend interface {
 	// Authenticate checks the request against the backend.
 	// If the error parameter is not nil then a communications error must have occurred
-	Authenticate(r *http.Request) (bool, error)
+	Authenticate(r *http.Request) (bool, string, error)
 }
 
 type Constructor func(config string) (Backend, error)

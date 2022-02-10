@@ -25,6 +25,7 @@
 package reauth
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/caddyserver/caddy"
@@ -83,11 +84,12 @@ RULE:
 			}
 		}
 		for _, b := range p.backends {
-			ok, err := b.Authenticate(r)
+			ok, un, err := b.Authenticate(r)
 			if err != nil {
 				return http.StatusInternalServerError, err
 			}
 			if ok {
+				r = r.WithContext(context.WithValue(r.Context(), httpserver.RemoteUserCtxKey, un))
 				return h.next.ServeHTTP(w, r)
 			}
 		}

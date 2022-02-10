@@ -12,7 +12,7 @@ func TestAuthenticate(t *testing.T) {
 
 	t.Log("Testing no credentials")
 	r, _ := http.NewRequest("GET", "https://test.example.com", nil)
-	ok, err := auth.Authenticate(r)
+	ok, _, err := auth.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -22,7 +22,7 @@ func TestAuthenticate(t *testing.T) {
 
 	t.Log("Testing wrong credentials")
 	r.SetBasicAuth("fred", "blogs")
-	ok, err = auth.Authenticate(r)
+	ok, _, err = auth.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -32,7 +32,7 @@ func TestAuthenticate(t *testing.T) {
 
 	t.Log("Testing correct credentials")
 	r.SetBasicAuth("bob-bcrypt", "secret")
-	ok, err = auth.Authenticate(r)
+	ok, _, err = auth.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}

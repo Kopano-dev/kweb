@@ -151,15 +151,15 @@ func constructor(config string) (backend.Backend, error) {
 }
 
 // Authenticate fulfils the backend interface
-func (h *LDAP) Authenticate(r *http.Request) (bool, error) {
+func (h *LDAP) Authenticate(r *http.Request) (bool, string, error) {
 	un, pw, k := r.BasicAuth()
 	if !k {
-		return false, nil
+		return false, un, nil
 	}
 
 	l, err := h.getConnection()
 	if err != nil {
-		return false, err
+		return false, un, err
 	}
 	defer h.stashConnection(l)
 
@@ -174,15 +174,15 @@ func (h *LDAP) Authenticate(r *http.Request) (bool, error) {
 
 	sr, err := l.Search(searchRequest)
 	if err != nil {
-		return false, fmt.Errorf("search under %q for %q: %v", h.baseDN, fmt.Sprintf(h.filterDN, un+h.principalSuffix), err)
+		return false, un, fmt.Errorf("search under %q for %q: %v", h.baseDN, fmt.Sprintf(h.filterDN, un+h.principalSuffix), err)
 	}
 
 	if len(sr.Entries) == 0 {
-		return false, nil // user does not exist
+		return false, un, nil // user does not exist
 	}
 
 	if len(sr.Entries) > 1 {
-		return false, fmt.Errorf("too many entries returned")
+		return false, un, fmt.Errorf("too many entries returned")
 	}
 
 	userDN := sr.Entries[0].DN
@@ -191,12 +191,12 @@ func (h *LDAP) Authenticate(r *http.Request) (bool, error) {
 	err = l.Bind(userDN, pw)
 	if err != nil {
 		if ldp.IsErrorWithCode(err, ldp.LDAPResultInvalidCredentials) {
-			return false, nil
+			return false, "", nil
 		}
-		return false, fmt.Errorf("bind with %q: %v", userDN, err)
+		return false, un, fmt.Errorf("bind with %q: %v", userDN, err)
 	}
 
-	return true, nil
+	return true, un, nil
 }
 
 func (h *LDAP) getConnection() (ldp.Client, error) {

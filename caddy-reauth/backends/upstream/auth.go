@@ -130,10 +130,10 @@ func constructor(config string) (backend.Backend, error) {
 }
 
 // Authenticate fulfils the backend interface
-func (h Upstream) Authenticate(r *http.Request) (bool, error) {
+func (h Upstream) Authenticate(r *http.Request) (bool, string, error) {
 	un, pw, k := r.BasicAuth()
 	if !(k || h.passCookies) {
-		return false, nil
+		return false, un, nil
 	}
 
 	c := &http.Client{
@@ -152,7 +152,7 @@ func (h Upstream) Authenticate(r *http.Request) (bool, error) {
 
 	req, err := http.NewRequest("GET", h.url.String(), nil)
 	if err != nil {
-		return false, err
+		return false, un, err
 	}
 
 	if k {
@@ -167,17 +167,17 @@ func (h Upstream) Authenticate(r *http.Request) (bool, error) {
 
 	resp, err := c.Do(req)
 	if err != nil {
-		return false, err
+		return false, un, err
 	}
 
 	if resp.StatusCode != 200 {
-		return false, nil
+		return false, un, nil
 	}
 
 	if h.match != nil && h.match.MatchString(resp.Request.URL.String()) {
-		return false, nil
+		return false, un, nil
 	}
 
-	return true, nil
+	return true, un, nil
 
 }

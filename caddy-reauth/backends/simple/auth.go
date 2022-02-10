@@ -57,15 +57,15 @@ func constructor(config string) (backend.Backend, error) {
 }
 
 // Authenticate fulfils the backend interface
-func (h Simple) Authenticate(r *http.Request) (bool, error) {
+func (h Simple) Authenticate(r *http.Request) (bool, string, error) {
 	un, pw, k := r.BasicAuth()
 	if !k {
-		return false, nil
+		return false, un, nil
 	}
 
 	if p, found := h.credentials[un]; !(found && p == pw) {
-		return false, nil
+		return false, un, nil
 	}
 
-	return true, nil
+	return true, un, nil
 }

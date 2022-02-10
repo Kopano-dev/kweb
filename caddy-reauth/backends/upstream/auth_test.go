@@ -90,7 +90,7 @@ func TestAuthenticateSimple(t *testing.T) {
 
 	t.Log("Testing no credentials")
 	r, _ := http.NewRequest("GET", "https://test.example.com", nil)
-	ok, err := us.Authenticate(r)
+	ok, _, err := us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -100,7 +100,7 @@ func TestAuthenticateSimple(t *testing.T) {
 
 	t.Log("Testing wrong credentials")
 	r.SetBasicAuth("fred", "blogs")
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -110,7 +110,7 @@ func TestAuthenticateSimple(t *testing.T) {
 
 	t.Log("Testing correct credentials")
 	r.SetBasicAuth("bob-bcrypt", "secret")
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -120,7 +120,7 @@ func TestAuthenticateSimple(t *testing.T) {
 
 	t.Log("Testing over https with bad cert")
 	us.url = suri
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err == nil {
 		t.Errorf("Expected an error, didn't get one")
 	} else {
@@ -137,7 +137,7 @@ func TestAuthenticateSimple(t *testing.T) {
 
 	t.Log("Testing over https with skipverify")
 	us.insecureSkipVerify = true
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -159,7 +159,7 @@ func TestAuthenticateRedirects(t *testing.T) {
 	r, _ := http.NewRequest("GET", "https://test.example.com", nil)
 	r.SetBasicAuth("bob-bcrypt", "secret")
 
-	ok, err := us.Authenticate(r)
+	ok, _, err := us.Authenticate(r)
 	if err == nil {
 		t.Error("Expected an error, didn't get one")
 	} else if err.Error() != "Get /auth: follow redirects disabled" {
@@ -171,7 +171,7 @@ func TestAuthenticateRedirects(t *testing.T) {
 
 	us.followRedirects = true
 
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -194,7 +194,7 @@ func TestAuthenticateCookie(t *testing.T) {
 
 	t.Log("Testing no credentials")
 	r, _ := http.NewRequest("GET", "https://test.example.com", nil)
-	ok, err := us.Authenticate(r)
+	ok, _, err := us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -204,7 +204,7 @@ func TestAuthenticateCookie(t *testing.T) {
 
 	t.Log("Testing wrong credentials")
 	r.AddCookie(&http.Cookie{Name: "test", Value: "trustnoone"})
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -215,7 +215,7 @@ func TestAuthenticateCookie(t *testing.T) {
 	t.Log("Testing correct credentials")
 	r, _ = http.NewRequest("GET", "https://test.example.com", nil)
 	r.AddCookie(&http.Cookie{Name: "test", Value: "trustme"})
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -240,7 +240,7 @@ func TestAuthenticateCookieRedirect(t *testing.T) {
 
 	t.Log("Testing no credentials")
 	r, _ := http.NewRequest("GET", "https://test.example.com", nil)
-	ok, err := us.Authenticate(r)
+	ok, _, err := us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -250,7 +250,7 @@ func TestAuthenticateCookieRedirect(t *testing.T) {
 
 	t.Log("Testing wrong credentials")
 	r.AddCookie(&http.Cookie{Name: "test", Value: "trustnoone"})
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
@@ -261,7 +261,7 @@ func TestAuthenticateCookieRedirect(t *testing.T) {
 	t.Log("Testing correct credentials")
 	r, _ = http.NewRequest("GET", "https://test.example.com", nil)
 	r.AddCookie(&http.Cookie{Name: "test", Value: "trustme"})
-	ok, err = us.Authenticate(r)
+	ok, _, err = us.Authenticate(r)
 	if err != nil {
 		t.Errorf("Unexpected error `%v`", err)
 	}
