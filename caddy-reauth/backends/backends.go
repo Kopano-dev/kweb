@@ -25,11 +25,9 @@
 package backends
 
 import (
-	_ "github.com/freman/caddy-reauth/backends/gitlabci"
-	_ "github.com/freman/caddy-reauth/backends/ldap"
-	_ "github.com/freman/caddy-reauth/backends/refresh"
-	_ "github.com/freman/caddy-reauth/backends/simple"
-	_ "github.com/freman/caddy-reauth/backends/upstream"
+	_ "stash.kopano.io/kgol/kweb/caddy-reauth/backends/ldap"
+	_ "stash.kopano.io/kgol/kweb/caddy-reauth/backends/simple"
+	_ "stash.kopano.io/kgol/kweb/caddy-reauth/backends/upstream"
 )
 
 // This page intentionally left blank ;)

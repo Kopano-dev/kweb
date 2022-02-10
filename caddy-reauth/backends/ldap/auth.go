@@ -34,7 +34,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/freman/caddy-reauth/backend"
+	"stash.kopano.io/kgol/kweb/caddy-reauth/backend"
 
 	ldp "gopkg.in/ldap.v2"
 )

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/freman/caddy-reauth/backend"
+	"stash.kopano.io/kgol/kweb/caddy-reauth/backend"
 )
 
 type failure interface {

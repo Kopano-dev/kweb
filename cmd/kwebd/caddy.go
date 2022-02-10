@@ -23,6 +23,7 @@ import (
 	_ "stash.kopano.io/kgol/kweb/caddy-configjson"
 	_ "stash.kopano.io/kgol/kweb/caddy-fastcgi"
 	_ "stash.kopano.io/kgol/kweb/caddy-folderish"
+	_ "stash.kopano.io/kgol/kweb/caddy-reauth"
 	_ "stash.kopano.io/kgol/kweb/caddy-staticpwa"
 )
 

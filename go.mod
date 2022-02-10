@@ -17,6 +17,8 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xuqingfeng/caddy-rate-limit v1.6.7
+	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
+	gopkg.in/ldap.v2 v2.5.1
 	stash.kopano.io/kgol/caddy-prometheus v0.0.0-20190726090614-6055bc7a4bdf
 )
 

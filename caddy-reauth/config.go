@@ -27,8 +27,8 @@ package reauth
 import (
 	"fmt"
 
-	"github.com/freman/caddy-reauth/backend"
-	_ "github.com/freman/caddy-reauth/backends"
+	"stash.kopano.io/kgol/kweb/caddy-reauth/backend"
+	_ "stash.kopano.io/kgol/kweb/caddy-reauth/backends"
 
 	"github.com/caddyserver/caddy"
 )

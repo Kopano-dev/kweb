@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/caddyserver/caddy"
-	"github.com/freman/caddy-reauth/backend"
+	"stash.kopano.io/kgol/kweb/caddy-reauth/backend"
 )
 
 func TestCaddyReauthConfigs(t *testing.T) {
