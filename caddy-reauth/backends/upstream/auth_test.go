@@ -162,7 +162,7 @@ func TestAuthenticateRedirects(t *testing.T) {
 	ok, _, err := us.Authenticate(r)
 	if err == nil {
 		t.Error("Expected an error, didn't get one")
-	} else if err.Error() != "Get /auth: follow redirects disabled" {
+	} else if err.Error() != "Get \"/auth\": follow redirects disabled" {
 		t.Errorf("Unexpected error `%v`", err)
 	}
 	if ok {
@@ -291,7 +291,7 @@ func TestAuthenticateConstructor(t *testing.T) {
 			`Invalid url configuration`,
 			`url=!http://google.com`,
 			nil,
-			errors.New(`unable to parse url !http://google.com: parse !http://google.com: first path segment in URL cannot contain colon`),
+			errors.New(`unable to parse url !http://google.com: parse "!http://google.com": first path segment in URL cannot contain colon`),
 		}, {
 			`With valid arguments`,
 			`url=http://google.com,timeout=5s,insecure=true,follow=true`,
@@ -301,7 +301,7 @@ func TestAuthenticateConstructor(t *testing.T) {
 			`With invalid timeout`,
 			`url=http://google.com,timeout=5j`,
 			nil,
-			errors.New(`unable to parse timeout 5j: time: unknown unit j in duration 5j`),
+			errors.New(`unable to parse timeout 5j: time: unknown unit "j" in duration "5j"`),
 		}, {
 			`With invalid insecure`,
 			`url=http://google.com,insecure=yesplease`,
