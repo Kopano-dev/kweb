@@ -4,7 +4,7 @@ Flexible web server with integrated URL routing for Kopano services.
 
 ## Build dependencies
 
-Make sure you have Go 1.13 or later installed. This project uses Go modules.
+Make sure you have Go 1.18 or later installed. This project uses Go modules.
 
 ## Building from source
 
