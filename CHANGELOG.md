@@ -4,6 +4,15 @@
 
 
 
+## v0.15.0 (2022-04-13)
+
+- Do not run go mod tidy on build
+- No longer run gofmt on all builds, it now needs to be run explicitly
+- Bump required minimal Go version to 1.18
+- Install Go build dependency tools with go install for Go 1.18 compatibility
+- Build with and bump to Go 1.18
+
+
 ## v0.14.0 (2022-02-10)
 
 - Update HTTP/3 support library
