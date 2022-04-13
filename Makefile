@@ -40,9 +40,13 @@ TIMEOUT  = 30
 # Build
 
 .PHONY: all
-all: fmt | $(CMDS) $(PLUGINS)
+all: vendor | commands plugins
 
-plugins: fmt | $(PLUGINS)
+.PHONY: commands
+commands: $(CMDS)
+
+.PHONY: plugins
+plugins: $(PLUGINS)
 
 .PHONY: $(CMDS)
 $(CMDS): vendor ; $(info building $@ ...) @
