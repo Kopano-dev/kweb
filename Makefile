@@ -132,12 +132,13 @@ test-coverage: ; $(info running coverage tests ...)
 
 # Mod
 
+.PHONY: go.sum
 go.sum: go.mod ; $(info updating dependencies ...)
 	@$(GO) mod tidy -v
 	@touch $@
 
 .PHONY: vendor
-vendor: go.sum ; $(info retrieving dependencies ...)
+vendor: go.mod ; $(info retrieving dependencies ...)
 	@$(GO) mod vendor -v
 	@touch $@
 
