@@ -23,12 +23,12 @@ RUN curl -sfL \
 	https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
 	sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_TAG}
 
-RUN GOBIN=/usr/local/bin go get -v \
-	github.com/tebeka/go2xunit \
-	github.com/axw/gocov/... \
-	github.com/AlekSi/gocov-xml \
-	github.com/wadey/gocovmerge \
-	&& go clean -cache && rm -rf /root/go
+RUN GOBIN=/usr/local/bin; \
+    go install -v github.com/tebeka/go2xunit@latest; \
+	go install -v github.com/axw/gocov/gocov@latest; \
+	go install -v github.com/AlekSi/gocov-xml@latest; \
+	go install -v github.com/wadey/gocovmerge@latest; \
+	go clean -cache && rm -rf /root/go
 
 ENV DEBIAN_FRONTEND noninteractive
 
