@@ -64,7 +64,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
-replace github.com/caddyserver/caddy => github.com/longsleep/caddy v1.0.6-0.20211008153515-2e836ef87ed2
+replace github.com/caddyserver/caddy => github.com/longsleep/caddy v1.0.6-0.20220427172633-e80140f7696e
 
 replace github.com/lucas-clemente/quic-go => github.com/lucas-clemente/quic-go v0.25.0
 

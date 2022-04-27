@@ -256,8 +256,8 @@ github.com/labbsr0x/bindman-dns-webhook v1.0.2/go.mod h1:p6b+VCXIR8NYKpDr8/dg1HK
 github.com/labbsr0x/goh v1.0.1/go.mod h1:8K2UhVoaWXcCU7Lxoa2omWnC8gyW8px7/lmO61c027w=
 github.com/linode/linodego v0.10.0/go.mod h1:cziNP7pbvE3mXIPneHj0oRY8L1WtGEIKlZ8LANE4eXA=
 github.com/liquidweb/liquidweb-go v1.6.0/go.mod h1:UDcVnAMDkZxpw4Y7NOHkqoeiGacVLEIG/i5J9cyixzQ=
-github.com/longsleep/caddy v1.0.6-0.20211008153515-2e836ef87ed2 h1:sfFfsGYlNC/KH47t8vkqfZx5+YBLJI3SUhNitVyRX3U=
-github.com/longsleep/caddy v1.0.6-0.20211008153515-2e836ef87ed2/go.mod h1:qjceoKbWJx0t+oXYRlCdpNzyHYrRoUUqOgdkqjD8RDc=
+github.com/longsleep/caddy v1.0.6-0.20220427172633-e80140f7696e h1:sPvRe/k1D+o8AdI2p0LnWH/j9oEkNwok1VwWl7dIS28=
+github.com/longsleep/caddy v1.0.6-0.20220427172633-e80140f7696e/go.mod h1:qjceoKbWJx0t+oXYRlCdpNzyHYrRoUUqOgdkqjD8RDc=
 github.com/lucas-clemente/quic-go v0.25.0 h1:K+X9Gvd7JXsOHtU0N2icZ2Nw3rx82uBej3mP4CLgibc=
 github.com/lucas-clemente/quic-go v0.25.0/go.mod h1:YtzP8bxRVCBlO77yRanE264+fY/T2U9ZlW1AaHOsMOg=
 github.com/lunixbochs/vtclean v1.0.0/go.mod h1:pHhQNgMf3btfWnGBVipUOjRYhoOsdGqdm/+2c2E2WMI=
