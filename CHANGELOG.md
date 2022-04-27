@@ -4,6 +4,11 @@
 
 
 
+## v0.15.1 (2022-04-27)
+
+- Fix HTTP/3 request support with proxy backend
+
+
 ## v0.15.0 (2022-04-13)
 
 - Do not run go mod tidy on build
