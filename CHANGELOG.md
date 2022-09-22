@@ -4,6 +4,12 @@
 
 
 
+## v0.15.2 (2022-09-22)
+
+- Fix Go 1.19 compatibility by updating h3 support
+- Build with Go 1.19.1
+
+
 ## v0.15.1 (2022-04-27)
 
 - Fix HTTP/3 request support with proxy backend
